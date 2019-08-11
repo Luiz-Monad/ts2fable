@@ -21,7 +21,7 @@ var babelOptions = fableUtils.resolveBabelOptions({
         "react"
     ],
     plugins: [
-        "transform-class-properties"
+        "proposal-class-properties"
     ]
 });
 

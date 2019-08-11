@@ -2,6 +2,13 @@ module ts2fable.node.Version
 
 open Node
 open Fable.Core.JsInterop
+open Thoth.Json
+
+let inline private ofJson<'T> (a: string) : 'T =
+    let decoder = Decode.Auto.generateDecoder<'T>()
+    match Decode.fromString decoder a with
+    | Ok o -> o
+    | Error e -> failwith e
 
 type PackageJson =
     {
