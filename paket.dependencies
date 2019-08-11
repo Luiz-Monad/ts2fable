@@ -1,15 +1,21 @@
-source https://nuget.org/api/v2
-storage:none
+source https://api.nuget.org/v3/index.json
+storage none
 
-clitool dotnet-fable
-nuget Fable.Core
-nuget Fable.Import.Browser
+group source
+    source https://api.nuget.org/v3/index.json
+    storage:none
+    
+    nuget Fsharp.Core
+    nuget Fable.Core ~> 2
+    nuget Fable.Import.Browser
+    nuget Thoth.Json.Net
 
 group netcorebuild
     source https://api.nuget.org/v3/index.json
     storage:none
     framework: netstandard2.0
 
+    nuget Fsharp.Core ~> 4.6.0
     nuget Fake.DotNet.Cli
     nuget Fake.IO.FileSystem
     nuget Fake.Core.Environment
@@ -19,6 +25,9 @@ group netcorebuild
     nuget Fake.Windows.Chocolatey
     nuget Fake.Core.Target
     nuget Fake.JavaScript.Yarn
+
+    clitool dotnet-fake
+    clitool dotnet-fable
 
 group WebApp
     source https://api.nuget.org/v3/index.json

@@ -1,4 +1,3 @@
-dotnet-fable
 group WebApp
 
     Fable.Core
@@ -13,3 +12,5 @@ group WebApp
     Fulma.Extensions
 
     File: Monaco.fs
+
+    dotnet-fable

@@ -41,7 +41,7 @@ let run' timeout (cmd:string) dir args  =
 let run = run' System.TimeSpan.MaxValue
 
 let platformTool tool =
-    Process.tryFindFileOnPath tool
+    ProcessUtils.tryFindFileOnPath tool
     |> function Some t -> t | _ -> failwithf "%s not found" tool
 
 let npmTool = platformTool "npm"
@@ -74,7 +74,8 @@ Target.create "YarnInstall" (fun _ ->
 Target.create "Restore" (fun _ ->
     DotNet.restore(id) (toolDir</>"DotnetCLI.fsproj")
     DotNet.restore(id) (testDir</>"test.fsproj")
-    DotNet.restore(id) cliProj
+    DotNet.restore(id) (testCompileDir</>"test-compile.fsproj")
+    DotNet.restore(id) (cliProj)
     DotNet.restore(id) ("web-app" </> "ts2fable-web-app.fsproj")
 )
 
@@ -83,7 +84,7 @@ Target.create "BuildCli" (fun _ ->
         DotNet.exec
             (dtntWorkDir toolDir)
             "fable"
-            "webpack --port free -- --config webpack.config.cli.js"
+            "webpack --port free -- --config tools\\webpack.config.cli.js"
 
     if not result.OK then failwithf "dotnet fable failed with code %i" result.ExitCode
 )

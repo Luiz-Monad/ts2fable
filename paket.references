@@ -1,0 +1,12 @@
+group netcorebuild
+    Fsharp.Core
+    Fake.DotNet.Cli
+    Fake.IO.FileSystem
+    Fake.Core.Environment
+    Fake.Core.BuildServer
+    Fake.Api.GitHub
+    Fake.Tools.Git
+    Fake.Windows.Chocolatey
+    Fake.Core.Target
+    Fake.JavaScript.Yarn
+    dotnet-fake
