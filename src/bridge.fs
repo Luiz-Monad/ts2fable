@@ -13,6 +13,7 @@ open ts2fable.Transform
 open System.Collections.Generic
 
 let scriptTarget = ScriptTarget.ES2015
+
 type internal NodeBridge =
     {
         TsPaths: string list
@@ -23,6 +24,7 @@ type internal NodeBridge =
         GetFsFileKind:  (NodeBridge * string) -> FsFileKind
         FixNamespace: FsFile -> FsFile
     }
+
 [<RequireQualifiedAccess>]
 module internal NodeBridge =
     let useExport nb f =
@@ -72,14 +74,15 @@ module internal Bridge =
     let private getNamespace =      
         function
         | Bridge.Node nb -> nb.NameSpace
-        | Bridge.Web _ -> "moduleName"  
+        | Bridge.Web _ -> "moduleName" 
+
     let private createProgram bridge =
         let createDummy tsPaths (sourceFiles: SourceFile list) =
             let options = jsOptions<CompilerOptions>(fun o ->
                 o.target <- Some scriptTarget
                 o.``module`` <- Some ModuleKind.CommonJS
             )
-            let host =  jsOptions<CompilerHost>(fun o ->
+            let host = jsOptions<CompilerHost>(fun o ->
                 o.getSourceFile <- fun fileName -> sourceFiles |> List.tryFind (fun sf -> sf.fileName = fileName)
                 o.writeFile <- fun (_,_) -> ()
                 o.getDefaultLibFileName <- fun _ -> "lib.d.ts"
@@ -158,7 +161,7 @@ module internal Bridge =
         for export in exportFiles do
             printfn "export %s" export
 
-        let tsFiles = exportFiles |> List.map program.getSourceFile
+        let tsFiles = exportFiles |> List.map program.getSourceFile |> List.choose id
         let checker = program.getTypeChecker()
         
         let moduleNameMap =

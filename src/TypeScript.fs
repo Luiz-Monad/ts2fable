@@ -11,7 +11,7 @@ type [<AllowNullLiteral>] IExports =
     abstract clearTimeout: handle: obj option -> unit
 
 module Ts =
-    let [<Import("ScriptSnapshot","typescript/ts")>] scriptSnapshot: ScriptSnapshot.IExports = jsNative
+    let [<Import("ScriptSnapshot","typescript")>] scriptSnapshot: ScriptSnapshot.IExports = jsNative
 
     type [<AllowNullLiteral>] IExports =
         abstract versionMajorMinor: obj
@@ -125,7 +125,7 @@ module Ts =
         /// Gets the return type node for the node if provided via JSDoc return tag or type tag.
         abstract getJSDocReturnType: node: Node -> TypeNode option
         /// Get all JSDoc tags related to a node, including those on parent nodes. 
-        abstract getJSDocTags: node: Node -> ResizeArray<JSDocTag>
+        abstract getJSDocTags: node: Node -> ResizeArray<JSDocTag> option
         /// Gets all JSDoc tags of a specified kind, or undefined if not present. 
         abstract getAllJSDocTagsOfKind: node: Node * kind: SyntaxKind -> ResizeArray<JSDocTag>
         /// Gets the effective type parameters. If the node was parsed in a
@@ -2066,7 +2066,7 @@ module Ts =
         inherit TypeNode
         inherit SignatureDeclarationBase
         abstract kind: SyntaxKind with get, set
-        abstract ``type``: TypeNode with get, set
+        abstract ``type``: TypeNode option with get, set
 
     type [<AllowNullLiteral>] FunctionTypeNode =
         inherit FunctionOrConstructorTypeNodeBase
@@ -2205,7 +2205,20 @@ module Ts =
     type [<AllowNullLiteral>] LiteralTypeNode =
         inherit TypeNode
         abstract kind: SyntaxKind with get, set
-        abstract literal: U3<BooleanLiteral, LiteralExpression, PrefixUnaryExpression> with get, set
+        abstract literal: TypeNodeLiteral with get, set
+
+    type TypeNodeLiteral =
+        U3<BooleanLiteral, LiteralExpression, PrefixUnaryExpression>
+
+    [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+    module TypeNodeLiteral =
+        let ts_isBooleanLiteral (v: Expression) = (v.kind = SyntaxKind.TrueKeyword || v.kind = SyntaxKind.FalseKeyword)
+        let (|IsBooleanLiteral|_|) (v: TypeNodeLiteral) = if ts_isBooleanLiteral (unbox v) then Some (v :> obj :?> BooleanLiteral) else None
+        let ts_isLiteralExpression (v: Expression) = (not (ts_isBooleanLiteral v) && not (ts_isPrefixUnaryExpression v))
+        let (|IsLiteralExpression|_|) (v: TypeNodeLiteral) = if ts_isLiteralExpression (unbox v) then Some (v :> obj :?> LiteralExpression) else None
+        let ts_isPrefixUnaryExpression (v: Expression) = (v.kind = SyntaxKind.PrefixUnaryExpression)
+        let (|IsPrefixUnaryExpression|_|) (v: TypeNodeLiteral) = if ts_isPrefixUnaryExpression (unbox v) then Some (v :> obj :?> PrefixUnaryExpression) else None
+        let (|TypeNodeLiteral|_|) v = match unbox v with IsBooleanLiteral _ | IsLiteralExpression _ | IsPrefixUnaryExpression _ -> Some (v :> obj :?> TypeNodeLiteral) | _ -> None
 
     type [<AllowNullLiteral>] StringLiteral =
         inherit LiteralExpression
@@ -4808,7 +4821,7 @@ module Ts =
 
     type [<AllowNullLiteral>] Type =
         abstract flags: TypeFlags with get, set
-        abstract symbol: Symbol with get, set
+        abstract symbol: Symbol option with get, set
         abstract pattern: DestructuringPattern option with get, set
         abstract aliasSymbol: Symbol option with get, set
         abstract aliasTypeArguments: ReadonlyArray<Type> option with get, set
@@ -5364,14 +5377,19 @@ module Ts =
         abstract configFileParsingDiagnostics: ReadonlyArray<Diagnostic> option with get, set
 
     type [<AllowNullLiteral>] ModuleResolutionHost =
-        abstract fileExists: fileName: string -> bool
-        abstract readFile: fileName: string -> string option
+        // abstract fileExists: fileName: string -> bool
+        abstract fileExists: (string -> bool) with get, set
+        // abstract readFile: fileName: string -> string option
+        abstract readFile: (string -> string option) with get, set
         abstract trace: s: string -> unit
-        abstract directoryExists: directoryName: string -> bool
+        // abstract directoryExists: directoryName: string -> bool
+        abstract directoryExists: (string -> bool) with get, set
         /// Resolve a symbolic link.
         abstract realpath: path: string -> string
-        abstract getCurrentDirectory: unit -> string
-        abstract getDirectories: path: string -> ResizeArray<string>
+        // abstract getCurrentDirectory: unit -> string
+        abstract getCurrentDirectory: (unit -> string) with get, set
+        // abstract getDirectories: path: string -> ResizeArray<string>
+        abstract getDirectories: (string -> ResizeArray<string>) with get, set
 
     /// Represents the result of module resolution.
     /// Module resolution will pick up tsx/jsx/js files even if '--jsx' and '--allowJs' are turned off.
@@ -5433,17 +5451,23 @@ module Ts =
     type [<AllowNullLiteral>] CompilerHost =
         inherit ModuleResolutionHost
         // abstract getSourceFile: fileName: string * languageVersion: ScriptTarget * ?onError: (string -> unit) * ?shouldCreateNewSourceFile: bool -> SourceFile option
-        abstract getSourceFile: (string -> SourceFile option) with get,set
+        abstract getSourceFile: (string -> SourceFile option) with get, set
         abstract getSourceFileByPath: fileName: string * path: Path * languageVersion: ScriptTarget * ?onError: (string -> unit) * ?shouldCreateNewSourceFile: bool -> SourceFile option
         abstract getCancellationToken: unit -> CancellationToken
-        abstract getDefaultLibFileName: options: CompilerOptions -> string
-        abstract getDefaultLibLocation: unit -> string
+        // abstract getDefaultLibFileName: options: CompilerOptions -> string
+        abstract getDefaultLibFileName: (CompilerOptions -> string) with get, set
+        //abstract getDefaultLibLocation: unit -> string
+        abstract getDefaultLibLocation: (unit -> string) with get, set
         // abstract writeFile: WriteFileCallback with get, set
         abstract writeFile: ((string * string) -> unit) with get, set
-        abstract getCurrentDirectory: unit -> string
-        abstract getCanonicalFileName: fileName: string -> string
-        abstract useCaseSensitiveFileNames: unit -> bool
-        abstract getNewLine: unit -> string
+        // abstract getCurrentDirectory: unit -> string
+        abstract getCurrentDirectory: (unit -> string) with get, set
+        // abstract getCanonicalFileName: fileName: string -> string
+        abstract getCanonicalFileName: (string -> string) with get, set
+        // abstract useCaseSensitiveFileNames: unit -> bool
+        abstract useCaseSensitiveFileNames: (unit -> bool) with get, set
+        // abstract getNewLine: unit -> string
+        abstract getNewLine: (unit -> string) with get, set
         abstract resolveModuleNames: moduleNames: ResizeArray<string> * containingFile: string * ?reusedNames: ResizeArray<string> * ?redirectedReference: ResolvedProjectReference -> ResizeArray<ResolvedModule option>
         /// This method is a companion for 'resolveModuleNames' and is used to resolve 'types' references to actual type declaration files
         abstract resolveTypeReferenceDirectives: typeReferenceDirectiveNames: ResizeArray<string> * containingFile: string * ?redirectedReference: ResolvedProjectReference -> ResizeArray<ResolvedTypeReferenceDirective option>

@@ -145,7 +145,7 @@ let readCommentsForSignatureDeclaration (checker: TypeChecker) (declaration: Sig
         match checker.getSignatureFromDeclaration declaration with
         | None -> []
         | Some signature ->
-            signature.getDocumentationComment() |> readComments
+            signature.getDocumentationComment (Some checker) |> readComments
     with _ -> 
         []        
 
@@ -153,7 +153,7 @@ let readCommentsAtLocation (checker: TypeChecker) (nd: Node): FsComment list =
     match checker.getSymbolAtLocation nd with
     | None -> []
     | Some symbol ->
-        symbol.getDocumentationComment() |> readComments
+        symbol.getDocumentationComment (Some checker) |> readComments
 
 let readInterface (checker: TypeChecker) (id: InterfaceDeclaration): FsInterface =
     {
@@ -260,6 +260,7 @@ let readTypeReference (checker: TypeChecker) (tr: TypeReferenceNode): FsType =
                 tas |> List.ofSeq |> List.map (readTypeNode checker)
         }
         |> FsType.Generic
+        
 let readFunctionType (checker: TypeChecker) (ft: FunctionTypeNode): FsFunction =
     {
         // TODO https://github.com/fable-compiler/ts2fable/issues/68
