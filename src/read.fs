@@ -27,18 +27,21 @@ let getAccessibility (modifiersOpt: ModifiersArray option) : FsAccessibility opt
 
 let getPropertyName(pn: PropertyName): string =
     match pn with
-    | U4.Case1 id -> id.getText() |> removeQuotes
-    | U4.Case2 sl -> sl.getText()
-    | U4.Case3 nl -> nl.getText()
-    | U4.Case4 cpn -> cpn.getText()
+    | PropertyName.IsIdentifier id -> id.getText() |> removeQuotes
+    | PropertyName.IsStringLiteral sl -> sl.getText()
+    | PropertyName.IsNumericLiteral nl -> nl.getText()
+    | PropertyName.IsComputedPropertyName cpn -> cpn.getText()
+    | _ -> failwithf "invalid property name %A" pn
 
 let getBindingName(bn: BindingName): string =
     match bn with
-    | U2.Case1 id -> id.getText()
-    | U2.Case2 bp -> // BindingPattern
+    | BindingName.IsIdentifier id -> id.getText()
+    | BindingName.IsBindingPattern bp -> // BindingPattern
         match bp with
-        | U2.Case1 obp -> obp.getText()
-        | U2.Case2 abp -> abp.getText()
+        | BindingPattern.IsObjectBindingPattern obp -> obp.getText()
+        | BindingPattern.IsArrayBindingPattern abp -> abp.getText()
+        | _ -> failwithf "invalid property name %A" bp
+    | _ -> failwithf "invalid property name %A" bn
 
 let readEnumCase(em: EnumMember): FsEnumCase =
     let name = em.name |> getPropertyName
@@ -243,8 +246,9 @@ let readTypeReference (checker: TypeChecker) (tr: TypeReferenceNode): FsType =
             Type =
                 let typeName =
                     match tr.typeName with
-                    | U2.Case1 id -> id.getText()
-                    | U2.Case2 qn -> qn.getText()
+                    | EntityName.IsIdentifier id -> id.getText()
+                    | EntityName.IsQualifiedName qn -> qn.getText()
+                    | _ -> null
                 if isNull typeName then
                     failwithf "readTypeReference type name is null: %s" (tr.getText())
                 {
@@ -337,9 +341,10 @@ let rec readTypeNode (checker: TypeChecker) (t: TypeNode): FsType =
                 FsType.StringLiteral (text |> removeQuotes)
             | _ -> simpleType "obj"
         match lt.literal with
-        | U3.Case1 bl -> readLiteralKind bl.kind (bl.getText())
-        | U3.Case2 le -> readLiteralKind le.kind (le.getText())
-        | U3.Case3 pue -> readLiteralKind pue.kind (pue.getText())
+        | TypeNodeLiteral.IsBooleanLiteral bl -> readLiteralKind bl.kind (bl.getText())
+        | TypeNodeLiteral.IsLiteralExpression le -> readLiteralKind le.kind (le.getText())
+        | TypeNodeLiteral.IsPrefixUnaryExpression pue -> readLiteralKind pue.kind (pue.getText())
+        | _ -> failwithf "invalid literal name %A" lt
     | SyntaxKind.ExpressionWithTypeArguments ->
         let eta = t :?> ExpressionWithTypeArguments
         let tp = checker.getTypeFromTypeNode eta
@@ -405,7 +410,7 @@ let readParameterDeclaration (checker: TypeChecker) (pd: ParameterDeclaration): 
 
 let readMethodSignature (checker: TypeChecker) (ms: MethodSignature): FsFunction =
     {
-        Comments = readCommentsForSignatureDeclaration checker ms
+        Comments = readCommentsForSignatureDeclaration checker (SignatureDeclaration.ofMethodSignature ms)
         Kind = FsFunctionKind.Regular
         IsStatic = hasModifier SyntaxKind.StaticKeyword ms.modifiers
         Name = ms.name |> getPropertyName |> Some
@@ -420,7 +425,7 @@ let readMethodSignature (checker: TypeChecker) (ms: MethodSignature): FsFunction
 
 let readMethodDeclaration checker (md: MethodDeclaration): FsFunction =
     {
-        Comments = readCommentsForSignatureDeclaration checker md
+        Comments = readCommentsForSignatureDeclaration checker (SignatureDeclaration.ofMethodDeclaration md)
         Kind = FsFunctionKind.Regular
         IsStatic = hasModifier SyntaxKind.StaticKeyword md.modifiers
         Name = md.name |> getPropertyName |> Some
@@ -454,10 +459,11 @@ let readPropertySignature (checker: TypeChecker) (ps: PropertySignature): FsProp
 
 let readPropertyNameComments (checker: TypeChecker) (pn: PropertyName): FsComment list =
     match pn with
-    | U4.Case1 id -> readCommentsAtLocation checker id
-    | U4.Case2 sl -> readCommentsAtLocation checker sl
-    | U4.Case3 nl -> readCommentsAtLocation checker nl
-    | U4.Case4 cpn -> readCommentsAtLocation checker cpn
+    | PropertyName.IsIdentifier id -> readCommentsAtLocation checker id
+    | PropertyName.IsStringLiteral sl -> readCommentsAtLocation checker sl
+    | PropertyName.IsNumericLiteral nl -> readCommentsAtLocation checker nl
+    | PropertyName.IsComputedPropertyName cpn -> readCommentsAtLocation checker cpn
+    | _ -> failwithf "invalid property name %A" pn
 
 let readPropertyDeclaration (checker: TypeChecker) (pd: PropertyDeclaration): FsProperty =
     {
@@ -477,7 +483,7 @@ let readPropertyDeclaration (checker: TypeChecker) (pd: PropertyDeclaration): Fs
 
 let readFunctionDeclaration (checker: TypeChecker) (fd: FunctionDeclaration): FsFunction =
     {     
-        Comments = readCommentsForSignatureDeclaration checker fd
+        Comments = readCommentsForSignatureDeclaration checker (SignatureDeclaration.ofFunctionDeclaration fd)
         Kind = FsFunctionKind.Regular
         IsStatic = hasModifier SyntaxKind.StaticKeyword fd.modifiers
         Name = fd.name |> Option.map (fun id -> id.getText())
@@ -493,7 +499,7 @@ let readFunctionDeclaration (checker: TypeChecker) (fd: FunctionDeclaration): Fs
 let readIndexSignature (checker: TypeChecker) (ps: IndexSignatureDeclaration): FsProperty =
     let pm = readParameterDeclaration checker ps.parameters.[0]
     {
-        Comments = readCommentsForSignatureDeclaration checker ps
+        Comments = readCommentsForSignatureDeclaration checker (SignatureDeclaration.ofIndexSignatureDeclaration ps)
         Kind = FsPropertyKind.Index
         Index = Some pm
         Name = "Item"
@@ -509,7 +515,7 @@ let readIndexSignature (checker: TypeChecker) (ps: IndexSignatureDeclaration): F
 
 let readCallSignature (checker: TypeChecker) (cs: CallSignatureDeclaration): FsFunction =
     {
-        Comments = readCommentsForSignatureDeclaration checker cs
+        Comments = readCommentsForSignatureDeclaration checker (SignatureDeclaration.ofCallSignatureDeclaration cs)
         Kind = FsFunctionKind.Call
         IsStatic = false // TODO ?
         Name = Some "Invoke"
@@ -524,7 +530,7 @@ let readCallSignature (checker: TypeChecker) (cs: CallSignatureDeclaration): FsF
 
 let readConstructSignatureDeclaration (checker: TypeChecker) (cs: ConstructSignatureDeclaration): FsFunction =
     {
-        Comments = readCommentsForSignatureDeclaration checker cs
+        Comments = readCommentsForSignatureDeclaration checker (SignatureDeclaration.ofConstructSignatureDeclaration cs)
         Kind = FsFunctionKind.Constructor
         IsStatic = true
         Name = Some "Create"
@@ -536,7 +542,7 @@ let readConstructSignatureDeclaration (checker: TypeChecker) (cs: ConstructSigna
 
 let readConstructorDeclaration (checker: TypeChecker) (cs: ConstructorDeclaration): FsFunction =
     {
-        Comments = readCommentsForSignatureDeclaration checker cs
+        Comments = readCommentsForSignatureDeclaration checker (SignatureDeclaration.ofConstructorDeclaration cs)
         Kind = FsFunctionKind.Constructor
         IsStatic = true
         Name = Some "Create"
@@ -623,8 +629,8 @@ let readImportDeclaration(im: ImportDeclaration): FsType list =
         | None -> []
         | Some namedBindings ->
             match namedBindings with
-            | U2.Case1 namespaceImport ->
-                if isNull namespaceImport.name = false then
+            | NamedImportBindings.IsNamespaceImport namespaceImport ->
+                if not <| isNull namespaceImport.name then
                     [
                         { Module = namespaceImport.name.getText(); SpecifiedModule = moduleSpecifier; ResolvedModule = None }
                         |> FsImport.Module |> FsType.Import
@@ -649,9 +655,12 @@ let readImportDeclaration(im: ImportDeclaration): FsType list =
                             )
                         | _ -> []
                     )
-            | U2.Case2 namedImports -> []
+            | NamedImportBindings.IsNamedImports _ -> []
+            | _ -> failwithf "invalid named binding import %A" cl
 
 let readStatement (checker: TypeChecker) (sd: Statement): FsType list =
+    //printfn "\n%s readStatement %A\n%s\n\n" (sd.getSourceFile().fileName) sd (sd.getText())
+
     match sd.kind with
     | SyntaxKind.InterfaceDeclaration ->
         [readInterface checker (sd :?> InterfaceDeclaration) |> FsType.Interface]
@@ -681,12 +690,20 @@ let readStatement (checker: TypeChecker) (sd: Statement): FsType list =
         let ime = sd :?> ImportEqualsDeclaration
         // printfn "import equals decl %s" (ime.getText())
         []
-    | _ -> printfn "unsupported Statement kind: %A" sd.kind; []
+    // | SyntaxKind.LabeledStatement ->
+    //     let lbs = sd :?> LabeledStatement
+    //     printfn "\n%s unsupported %A\n%s\n\n" (sd.getSourceFile().fileName) lbs (sd.getText()); []
+    // | SyntaxKind.ExpressionStatement ->
+    //     let es = sd :?> ExpressionStatement
+    //     printfn "\n%s unsupported %A\n%s\n\n" (sd.getSourceFile().fileName) es (sd.getText()); []
+    
+    | _ -> printfn "%s unsupported Statement kind: %A" (sd.getSourceFile().fileName) sd; []
 
 let readModuleName(mn: ModuleName): string =
     match mn with
-    | U2.Case1 id -> id.getText().Replace("\"","")
-    | U2.Case2 sl -> sl.getText()
+    | ModuleName.IsIdentifier id -> id.getText().Replace("\"","")
+    | ModuleName.IsStringLiteral sl -> sl.getText()
+    | _ -> failwithf "invalid module name %A" mn
 
 let rec readModuleDeclaration checker (md: ModuleDeclaration): FsModule =
     let types = List()

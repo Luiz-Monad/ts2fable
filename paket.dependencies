@@ -8,7 +8,7 @@ group source
     nuget Fsharp.Core
     nuget Fable.Core ~> 2
     nuget Fable.Import.Browser
-    nuget Thoth.Json.Net
+    nuget Thoth.Json
 
 group netcorebuild
     source https://api.nuget.org/v3/index.json

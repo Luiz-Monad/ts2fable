@@ -4,6 +4,15 @@ open System
 open Fable.Core
 open Fable.Import.JS
 
+[<Emit("typeof $0")>]
+let jsTypeof (_ : obj) : string = jsNative
+
+[<Emit("($0 instanceof $1)")>]
+let jsInstanceof (_ : obj) (_ : obj) : bool = jsNative
+
+[<Emit("UInt8Array")>]
+let jsUInt8Array : obj = jsNative
+
 let [<Global>] Symbol: SymbolConstructor = jsNative
 let [<Global>] ``process``: NodeJS.Process = jsNative
 let [<Global>] ``global``: NodeJS.Global = jsNative
@@ -728,7 +737,6 @@ module Events =
         abstract listenerCount: emitter: EventEmitter * ``event``: U2<string, Symbol> -> float
 
 module Http =
-    type URL = Url.URL
 
     type [<AllowNullLiteral>] IExports =
         abstract Server: ServerStatic
@@ -743,8 +751,8 @@ module Http =
         abstract STATUS_CODES: obj
         abstract createServer: ?requestListener: (IncomingMessage -> ServerResponse -> unit) -> Server
         abstract createClient: ?port: float * ?host: string -> obj option
-        abstract request: options: U3<RequestOptions, string, URL> * ?callback: (IncomingMessage -> unit) -> ClientRequest
-        abstract get: options: U3<RequestOptions, string, URL> * ?callback: (IncomingMessage -> unit) -> ClientRequest
+        abstract request: options: U3<RequestOptions, string, Url.URL> * ?callback: (IncomingMessage -> unit) -> ClientRequest
+        abstract get: options: U3<RequestOptions, string, Url.URL> * ?callback: (IncomingMessage -> unit) -> ClientRequest
         abstract globalAgent: Agent
 
     type [<AllowNullLiteral>] IncomingHttpHeaders =
@@ -878,7 +886,7 @@ module Http =
         abstract setSocketKeepAlive: ?enable: bool * ?initialDelay: float -> unit
 
     type [<AllowNullLiteral>] ClientRequestStatic =
-        [<Emit "new $0($1...)">] abstract Create: url: U3<string, URL, ClientRequestArgs> * ?cb: (IncomingMessage -> unit) -> ClientRequest
+        [<Emit "new $0($1...)">] abstract Create: url: U3<string, Url.URL, ClientRequestArgs> * ?cb: (IncomingMessage -> unit) -> ClientRequest
 
     type [<AllowNullLiteral>] IncomingMessage =
         inherit Stream.Readable
@@ -1341,21 +1349,20 @@ module Os =
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module NetworkInterfaceInfo =
         let ofNetworkInterfaceInfoIPv4 v: NetworkInterfaceInfo = v |> U2.Case1
-        let isNetworkInterfaceInfoIPv4 (v: NetworkInterfaceInfo) = match v with U2.Case1 _ -> true | _ -> false
-        let asNetworkInterfaceInfoIPv4 (v: NetworkInterfaceInfo) = match v with U2.Case1 o -> Some o | _ -> None
+        let isNetworkInterfaceInfoIPv4 (v: NetworkInterfaceInfo) = isNull (box (v :> obj :?> NetworkInterfaceInfoIPv6).scopeid)
+        let asNetworkInterfaceInfoIPv4 (v: NetworkInterfaceInfo) = if isNetworkInterfaceInfoIPv4 v then Some (v :> obj :?> NetworkInterfaceInfoIPv4) else None
         let ofNetworkInterfaceInfoIPv6 v: NetworkInterfaceInfo = v |> U2.Case2
-        let isNetworkInterfaceInfoIPv6 (v: NetworkInterfaceInfo) = match v with U2.Case2 _ -> true | _ -> false
-        let asNetworkInterfaceInfoIPv6 (v: NetworkInterfaceInfo) = match v with U2.Case2 o -> Some o | _ -> None
+        let isNetworkInterfaceInfoIPv6 (v: NetworkInterfaceInfo) = not (isNetworkInterfaceInfoIPv4 v)
+        let asNetworkInterfaceInfoIPv6 (v: NetworkInterfaceInfo) = if isNetworkInterfaceInfoIPv6 v then Some (v :> obj :?> NetworkInterfaceInfoIPv6) else None
 
 module Https =
-    type URL = Url.URL
 
     type [<AllowNullLiteral>] IExports =
         abstract Agent: AgentStatic
         abstract Server: ServerStatic
         abstract createServer: options: ServerOptions * ?requestListener: (Http.IncomingMessage -> Http.ServerResponse -> unit) -> Server
-        abstract request: options: U3<RequestOptions, string, URL> * ?callback: (Http.IncomingMessage -> unit) -> Http.ClientRequest
-        abstract get: options: U3<RequestOptions, string, URL> * ?callback: (Http.IncomingMessage -> unit) -> Http.ClientRequest
+        abstract request: options: U3<RequestOptions, string, Url.URL> * ?callback: (Http.IncomingMessage -> unit) -> Http.ClientRequest
+        abstract get: options: U3<RequestOptions, string, Url.URL> * ?callback: (Http.IncomingMessage -> unit) -> Http.ClientRequest
         abstract globalAgent: Agent
 
     type [<AllowNullLiteral>] ServerOptions =
@@ -1939,6 +1946,9 @@ module Url =
     type [<AllowNullLiteral>] URLSearchParamsStatic =
         [<Emit "new $0($1...)">] abstract Create: ?init: U5<URLSearchParams, string, obj, Iterable<string * string>, Array<string * string>> -> URLSearchParams
 
+    [<Emit("URL")>]
+    let URLClass : obj = jsNative
+
     type [<AllowNullLiteral>] URL =
         abstract hash: string with get, set
         abstract host: string with get, set
@@ -2160,11 +2170,11 @@ module Net =
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module SocketConnectOpts =
         let ofTcpSocketConnectOpts v: SocketConnectOpts = v |> U2.Case1
-        let isTcpSocketConnectOpts (v: SocketConnectOpts) = match v with U2.Case1 _ -> true | _ -> false
-        let asTcpSocketConnectOpts (v: SocketConnectOpts) = match v with U2.Case1 o -> Some o | _ -> None
+        let isTcpSocketConnectOpts (v: SocketConnectOpts) = isNull (box (v :> obj :?> IpcSocketConnectOpts).path)
+        let asTcpSocketConnectOpts (v: SocketConnectOpts) = if isTcpSocketConnectOpts v then Some (v :> obj :?> TcpSocketConnectOpts) else None
         let ofIpcSocketConnectOpts v: SocketConnectOpts = v |> U2.Case2
-        let isIpcSocketConnectOpts (v: SocketConnectOpts) = match v with U2.Case2 _ -> true | _ -> false
-        let asIpcSocketConnectOpts (v: SocketConnectOpts) = match v with U2.Case2 o -> Some o | _ -> None
+        let isIpcSocketConnectOpts (v: SocketConnectOpts) = not (isTcpSocketConnectOpts v)
+        let asIpcSocketConnectOpts (v: SocketConnectOpts) = if isIpcSocketConnectOpts v then Some (v :> obj :?> IpcSocketConnectOpts) else None
 
     type [<AllowNullLiteral>] Socket =
         inherit Stream.Duplex
@@ -2356,11 +2366,11 @@ module Net =
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module NetConnectOpts =
         let ofTcpNetConnectOpts v: NetConnectOpts = v |> U2.Case1
-        let isTcpNetConnectOpts (v: NetConnectOpts) = match v with U2.Case1 _ -> true | _ -> false
-        let asTcpNetConnectOpts (v: NetConnectOpts) = match v with U2.Case1 o -> Some o | _ -> None
+        let isTcpNetConnectOpts (v: NetConnectOpts) = isNull (box (v :> obj :?> IpcNetConnectOpts).path)
+        let asTcpNetConnectOpts (v: NetConnectOpts) = if isTcpNetConnectOpts v then Some (v :> obj :?> TcpNetConnectOpts) else None
         let ofIpcNetConnectOpts v: NetConnectOpts = v |> U2.Case2
-        let isIpcNetConnectOpts (v: NetConnectOpts) = match v with U2.Case2 _ -> true | _ -> false
-        let asIpcNetConnectOpts (v: NetConnectOpts) = match v with U2.Case2 o -> Some o | _ -> None
+        let isIpcNetConnectOpts (v: NetConnectOpts) = not (isTcpNetConnectOpts v)
+        let asIpcNetConnectOpts (v: NetConnectOpts) = if isIpcNetConnectOpts v then Some (v :> obj :?> IpcNetConnectOpts) else None
 
 module Dgram =
 
@@ -2458,7 +2468,6 @@ module Dgram =
         [<Emit "new $0($1...)">] abstract Create: unit -> Socket
 
 module Fs =
-    type URL = Url.URL
     let [<Import("rename","fs")>] rename: Rename.IExports = jsNative
     let [<Import("truncate","fs")>] truncate: Truncate.IExports = jsNative
     let [<Import("ftruncate","fs")>] ftruncate: Ftruncate.IExports = jsNative
@@ -3051,19 +3060,19 @@ module Fs =
         abstract copyFileSync: src: PathLike * dest: PathLike * ?flags: float -> unit
 
     type PathLike =
-        U3<string, Buffer, URL>
+        U3<string, Buffer, Url.URL>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module PathLike =
         let ofString v: PathLike = v |> U3.Case1
-        let isString (v: PathLike) = match v with U3.Case1 _ -> true | _ -> false
-        let asString (v: PathLike) = match v with U3.Case1 o -> Some o | _ -> None
+        let isString (v: PathLike) = jsTypeof v = "string"
+        let asString (v: PathLike) = if isString v then Some (v :> obj :?> string) else None
         let ofBuffer v: PathLike = v |> U3.Case2
-        let isBuffer (v: PathLike) = match v with U3.Case2 _ -> true | _ -> false
-        let asBuffer (v: PathLike) = match v with U3.Case2 o -> Some o | _ -> None
+        let isBuffer (v: PathLike) = jsInstanceof v jsUInt8Array
+        let asBuffer (v: PathLike) = if isBuffer v then Some (v :> obj :?> Buffer) else None
         let ofURL v: PathLike = v |> U3.Case3
-        let isURL (v: PathLike) = match v with U3.Case3 _ -> true | _ -> false
-        let asURL (v: PathLike) = match v with U3.Case3 o -> Some o | _ -> None
+        let isURL (v: PathLike) = jsInstanceof v Url.URLClass
+        let asURL (v: PathLike) = if isURL v then Some (v :> obj :?> Url.URL) else None
 
     type [<AllowNullLiteral>] Stats =
         abstract isFile: unit -> bool

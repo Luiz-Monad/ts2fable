@@ -3,4 +3,4 @@ group netcorebuild
 group source
     Fable.Core
     Fable.Import.Browser
-    Thoth.Json.Net
+    Thoth.Json

@@ -11,7 +11,7 @@ type [<AllowNullLiteral>] IExports =
     abstract clearTimeout: handle: obj option -> unit
 
 module Ts =
-    let [<Import("ScriptSnapshot","typescript/ts")>] scriptSnapshot: ScriptSnapshot.IExports = jsNative
+    let [<Import("ScriptSnapshot","typescript")>] scriptSnapshot: ScriptSnapshot.IExports = jsNative
 
     type [<AllowNullLiteral>] IExports =
         abstract OperationCanceledException: OperationCanceledExceptionStatic
@@ -1172,10 +1172,6 @@ module Ts =
         | FirstJSDocTagNode = 276
         | LastJSDocTagNode = 285
 
-    [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
-    module SyntaxKind =
-        let (|IsSyntaxKind|_|) (v: obj) = match Int32.TryParse(string v) with (true, _) -> Some (v :?> SyntaxKind) | _ -> None
-
     type [<RequireQualifiedAccess>] NodeFlags =
         | None = 0
         | Let = 1
@@ -1277,6 +1273,9 @@ module Ts =
     type ColonToken =
         Token<SyntaxKind>
 
+    type CommaToken =
+        Token<SyntaxKind>
+
     type EqualsToken =
         Token<SyntaxKind>
 
@@ -1287,7 +1286,7 @@ module Ts =
         Token<SyntaxKind>
 
     type EndOfFileToken =
-        obj
+        Token<SyntaxKind>
 
     type AtToken =
         Token<SyntaxKind>
@@ -1431,26 +1430,38 @@ module Ts =
         abstract parameters: ResizeArray<ParameterDeclaration> with get, set
         abstract ``type``: TypeNode option with get, set
 
-    type [<AllowNullLiteral>] SignatureDeclaration =
-        inherit SignatureDeclarationBase
-        inherit TypeElement
-        abstract kind: SyntaxKind with get, set
+    type SignatureDeclaration =
+        U2<U6<CallSignatureDeclaration, ConstructSignatureDeclaration, MethodSignature, IndexSignatureDeclaration, FunctionTypeNode, ConstructorTypeNode>,
+           U7<JSDocFunctionType, FunctionDeclaration, MethodDeclaration, ConstructorDeclaration, AccessorDeclaration, FunctionExpression, ArrowFunction>>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module SignatureDeclaration =
-        let (|IsCallSignatureDeclaration|_|) (v: Node) = if ts.isCallSignatureDeclaration (unbox v) then Some (v :> obj :?> CallSignatureDeclaration) else None
-        let (|IsConstructSignatureDeclaration|_|) (v: Node) = if ts.isConstructSignatureDeclaration (unbox v) then Some (v :> obj :?> ConstructSignatureDeclaration) else None
-        let (|IsMethodSignature|_|) (v: Node) = if ts.isMethodSignature (unbox v) then Some (v :> obj :?> MethodSignature) else None
-        let (|IsIndexSignatureDeclaration|_|) (v: Node) = if ts.isIndexSignatureDeclaration (unbox v) then Some (v :> obj :?> IndexSignatureDeclaration) else None
-        let (|IsFunctionTypeNode|_|) (v: Node) = if ts.isFunctionTypeNode (unbox v) then Some (v :> obj :?> FunctionTypeNode) else None
-        let (|IsConstructorTypeNode|_|) (v: Node) = if ts.isConstructorTypeNode (unbox v) then Some (v :> obj :?> ConstructorTypeNode) else None
-        let (|IsJSDocFunctionType|_|) (v: Node) = if ts.isJSDocFunctionType (unbox v) then Some (v :> obj :?> JSDocFunctionType) else None
-        let (|IsFunctionDeclaration|_|) (v: Node) = if ts.isFunctionDeclaration (unbox v) then Some (v :> obj :?> FunctionDeclaration) else None
-        let (|IsMethodDeclaration|_|) (v: Node) = if ts.isMethodDeclaration (unbox v) then Some (v :> obj :?> MethodDeclaration) else None
-        let (|IsConstructorDeclaration|_|) (v: Node) = if ts.isConstructorDeclaration (unbox v) then Some (v :> obj :?> ConstructorDeclaration) else None
-        let (|IsAccessorDeclaration|_|) (v: Node) = match unbox v with AccessorDeclaration.IsAccessorDeclaration v -> Some (v :> obj :?> AccessorDeclaration) | _ -> None
-        let (|IsFunctionExpression|_|) (v: Node) = if ts.isFunctionExpression (unbox v) then Some (v :> obj :?> FunctionExpression) else None
-        let (|IsArrowFunction|_|) (v: Node) = if ts.isArrowFunction (unbox v) then Some (v :> obj :?> ArrowFunction) else None
+        let (|IsCallSignatureDeclaration|_|) (v: SignatureDeclaration) = if ts.isCallSignatureDeclaration (unbox v) then Some (v :> obj :?> CallSignatureDeclaration) else None
+        let ofCallSignatureDeclaration v: SignatureDeclaration = v |> U6.Case1 |> U2.Case1
+        let (|IsConstructSignatureDeclaration|_|) (v: SignatureDeclaration) = if ts.isConstructSignatureDeclaration (unbox v) then Some (v :> obj :?> ConstructSignatureDeclaration) else None
+        let ofConstructSignatureDeclaration v: SignatureDeclaration = v |> U6.Case2 |> U2.Case1
+        let (|IsMethodSignature|_|) (v: SignatureDeclaration) = if ts.isMethodSignature (unbox v) then Some (v :> obj :?> MethodSignature) else None
+        let ofMethodSignature v: SignatureDeclaration = v |> U6.Case3 |> U2.Case1
+        let (|IsIndexSignatureDeclaration|_|) (v: SignatureDeclaration) = if ts.isIndexSignatureDeclaration (unbox v) then Some (v :> obj :?> IndexSignatureDeclaration) else None
+        let ofIndexSignatureDeclaration v: SignatureDeclaration = v |> U6.Case4 |> U2.Case1
+        let (|IsFunctionTypeNode|_|) (v: SignatureDeclaration) = if ts.isFunctionTypeNode (unbox v) then Some (v :> obj :?> FunctionTypeNode) else None
+        let ofFunctionTypeNode v: SignatureDeclaration = v |> U6.Case5 |> U2.Case1
+        let (|IsConstructorTypeNode|_|) (v: SignatureDeclaration) = if ts.isConstructorTypeNode (unbox v) then Some (v :> obj :?> ConstructorTypeNode) else None
+        let ofConstructorTypeNode v: SignatureDeclaration = v |> U6.Case6 |> U2.Case1
+        let (|IsJSDocFunctionType|_|) (v: SignatureDeclaration) = if ts.isJSDocFunctionType (unbox v) then Some (v :> obj :?> JSDocFunctionType) else None
+        let ofJSDocFunctionType v: SignatureDeclaration = v |> U7.Case1 |> U2.Case2
+        let (|IsFunctionDeclaration|_|) (v: SignatureDeclaration) = if ts.isFunctionDeclaration (unbox v) then Some (v :> obj :?> FunctionDeclaration) else None
+        let ofFunctionDeclaration v: SignatureDeclaration = v |> U7.Case2 |> U2.Case2
+        let (|IsMethodDeclaration|_|) (v: SignatureDeclaration) = if ts.isMethodDeclaration (unbox v) then Some (v :> obj :?> MethodDeclaration) else None
+        let ofMethodDeclaration v: SignatureDeclaration = v |> U7.Case3 |> U2.Case2
+        let (|IsConstructorDeclaration|_|) (v: SignatureDeclaration) = if ts.isConstructorDeclaration (unbox v) then Some (v :> obj :?> ConstructorDeclaration) else None
+        let ofConstructorDeclaration v: SignatureDeclaration = v |> U7.Case4 |> U2.Case2
+        let (|IsAccessorDeclaration|_|) (v: SignatureDeclaration) = match unbox v with AccessorDeclaration.IsAccessorDeclaration v -> Some (v :> obj :?> AccessorDeclaration) | _ -> None
+        let ofAccessorDeclaration v: SignatureDeclaration = v |> U7.Case5 |> U2.Case2
+        let (|IsFunctionExpression|_|) (v: SignatureDeclaration) = if ts.isFunctionExpression (unbox v) then Some (v :> obj :?> FunctionExpression) else None
+        let ofFunctionExpression v: SignatureDeclaration = v |> U7.Case6 |> U2.Case2
+        let (|IsArrowFunction|_|) (v: SignatureDeclaration) = if ts.isArrowFunction (unbox v) then Some (v :> obj :?> ArrowFunction) else None
+        let ofArrowFunction v: SignatureDeclaration = v |> U7.Case7 |> U2.Case2
         let (|IsSignatureDeclaration|_|) v = match unbox v with IsCallSignatureDeclaration _ | IsConstructSignatureDeclaration _ | IsMethodSignature _ | IsIndexSignatureDeclaration _ | IsFunctionTypeNode _ | IsConstructorTypeNode _ | IsJSDocFunctionType _ | IsFunctionDeclaration _ | IsMethodDeclaration _ | IsConstructorDeclaration _ | IsAccessorDeclaration _ | IsFunctionExpression _ | IsConstructSignatureDeclaration _ | IsConstructSignatureDeclaration _ | IsArrowFunction _ -> Some (v :> obj :?> BindingName) | _ -> None
 
     type [<AllowNullLiteral>] CallSignatureDeclaration =
@@ -1944,7 +1955,20 @@ module Ts =
     type [<AllowNullLiteral>] LiteralTypeNode =
         inherit TypeNode
         abstract kind: SyntaxKind with get, set
-        abstract literal: U3<BooleanLiteral, LiteralExpression, PrefixUnaryExpression> with get, set
+        abstract literal: TypeNodeLiteral with get, set
+
+    type TypeNodeLiteral =
+        U3<BooleanLiteral, LiteralExpression, PrefixUnaryExpression>
+
+    [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+    module TypeNodeLiteral =
+        let ts_isBooleanLiteral (v: Expression) = (v.kind = SyntaxKind.TrueKeyword || v.kind = SyntaxKind.FalseKeyword)
+        let (|IsBooleanLiteral|_|) (v: TypeNodeLiteral) = if ts_isBooleanLiteral (unbox v) then Some (v :> obj :?> BooleanLiteral) else None
+        let ts_isLiteralExpression (v: Expression) = (not (ts_isBooleanLiteral v) && not (ts_isPrefixUnaryExpression v))
+        let (|IsLiteralExpression|_|) (v: TypeNodeLiteral) = if ts_isLiteralExpression (unbox v) then Some (v :> obj :?> LiteralExpression) else None
+        let ts_isPrefixUnaryExpression (v: Expression) = (v.kind = SyntaxKind.PrefixUnaryExpression)
+        let (|IsPrefixUnaryExpression|_|) (v: TypeNodeLiteral) = if ts_isPrefixUnaryExpression (unbox v) then Some (v :> obj :?> PrefixUnaryExpression) else None
+        let (|TypeNodeLiteral|_|) v = match unbox v with IsBooleanLiteral _ | IsLiteralExpression _ | IsPrefixUnaryExpression _ -> Some (v :> obj :?> TypeNodeLiteral) | _ -> None
 
     type [<AllowNullLiteral>] StringLiteral =
         inherit LiteralExpression
@@ -2058,14 +2082,14 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module ExponentiationOperator =
-        let (|IsExponentiationOperator|_|) (v: obj) = match Int32.TryParse(string v) with (true, _) -> Some (v :?> ExponentiationOperator) | _ -> None
+        let (|IsExponentiationOperator|_|) (v: SyntaxKind) = if v = SyntaxKind.AsteriskAsteriskToken then Some (v :> obj :?> ExponentiationOperator) else None
 
     type MultiplicativeOperator =
         SyntaxKind
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module MultiplicativeOperator =
-        let (|IsMultiplicativeOperator|_|) (v: obj) = match Int32.TryParse(string v) with (true, _) -> Some (v :?> MultiplicativeOperator) | _ -> None
+        let (|IsMultiplicativeOperator|_|) (v: SyntaxKind) = if v = SyntaxKind.AsteriskToken || v = SyntaxKind.SlashToken || v = SyntaxKind.PercentToken then Some (v :> obj :?> MultiplicativeOperator) else None
 
     type MultiplicativeOperatorOrHigher =
         U2<ExponentiationOperator, MultiplicativeOperator>
@@ -2087,7 +2111,7 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module AdditiveOperator =
-        let (|IsAdditiveOperator|_|) (v: obj) = match Int32.TryParse(string v) with (true, _) -> Some (v :?> AdditiveOperator) | _ -> None
+        let (|IsAdditiveOperator|_|) (v: SyntaxKind) = if v = SyntaxKind.PlusToken || v = SyntaxKind.MinusToken then Some (v :> obj :?> AdditiveOperator) else None
 
     type AdditiveOperatorOrHigher =
         U2<MultiplicativeOperatorOrHigher, AdditiveOperator>
@@ -2109,7 +2133,7 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module ShiftOperator =
-        let (|IsShiftOperator|_|) (v: obj) = match Int32.TryParse(string v) with (true, _) -> Some (v :?> ShiftOperator) | _ -> None
+        let (|IsShiftOperator|_|) (v: SyntaxKind) = if v = SyntaxKind.LessThanLessThanToken || v = SyntaxKind.GreaterThanGreaterThanToken || v = SyntaxKind.GreaterThanGreaterThanGreaterThanToken then Some (v :> obj :?> ShiftOperator) else None
 
     type ShiftOperatorOrHigher =
         U2<AdditiveOperatorOrHigher, ShiftOperator>
@@ -2131,7 +2155,7 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module RelationalOperator =
-        let (|IsRelationalOperator|_|) (v: obj) = match Int32.TryParse(string v) with (true, _) -> Some (v :?> RelationalOperator) | _ -> None
+        let (|IsRelationalOperator|_|) (v: SyntaxKind) = if v = SyntaxKind.LessThanToken || v = SyntaxKind.LessThanEqualsToken || v = SyntaxKind.GreaterThanToken || v = SyntaxKind.GreaterThanEqualsToken || v = SyntaxKind.InstanceOfKeyword || v = SyntaxKind.InKeyword then Some (v :> obj :?> RelationalOperator) else None
 
     type RelationalOperatorOrHigher =
         U2<ShiftOperatorOrHigher, RelationalOperator>
@@ -2153,7 +2177,7 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module EqualityOperator =
-        let (|IsEqualityOperator|_|) (v: obj) = match Int32.TryParse(string v) with (true, _) -> Some (v :?> EqualityOperator) | _ -> None
+        let (|IsEqualityOperator|_|) (v: SyntaxKind) = if v = SyntaxKind.EqualsEqualsToken || v = SyntaxKind.EqualsEqualsEqualsToken || v = SyntaxKind.ExclamationEqualsEqualsToken || v = SyntaxKind.ExclamationEqualsToken then Some (v :> obj :?> EqualityOperator) else None
 
     type EqualityOperatorOrHigher =
         U2<RelationalOperatorOrHigher, EqualityOperator>
@@ -2175,7 +2199,7 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module BitwiseOperator =
-        let (|IsBitwiseOperator|_|) (v: obj) = match Int32.TryParse(string v) with (true, _) -> Some (v :?> BitwiseOperator) | _ -> None
+        let (|IsBitwiseOperator|_|) (v: SyntaxKind) = if v = SyntaxKind.AmpersandToken || v = SyntaxKind.BarToken || v = SyntaxKind.CaretToken then Some (v :> obj :?> BitwiseOperator) else None
 
     type BitwiseOperatorOrHigher =
         U2<EqualityOperatorOrHigher, BitwiseOperator>
@@ -2197,7 +2221,7 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module LogicalOperator =
-        let (|IsLogicalOperator|_|) (v: obj) = match Int32.TryParse(string v) with (true, _) -> Some (v :?> LogicalOperator) | _ -> None
+        let (|IsLogicalOperator|_|) (v: SyntaxKind) = if v = SyntaxKind.AmpersandAmpersandToken || v = SyntaxKind.BarBarToken then Some (v :> obj :?> LogicalOperator) else None
 
     type LogicalOperatorOrHigher =
         U2<BitwiseOperatorOrHigher, LogicalOperator>
@@ -2219,22 +2243,23 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module CompoundAssignmentOperator =
-        let (|IsCompoundAssignmentOperator|_|) (v: obj) = match Int32.TryParse(string v) with (true, _) -> Some (v :?> CompoundAssignmentOperator) | _ -> None
+        let (|IsCompoundAssignmentOperator|_|) (v: SyntaxKind) = if v = SyntaxKind.PlusEqualsToken || v = SyntaxKind.MinusEqualsToken || v = SyntaxKind.AsteriskAsteriskEqualsToken || v = SyntaxKind.AsteriskEqualsToken || v = SyntaxKind.SlashEqualsToken || v = SyntaxKind.PercentEqualsToken || v = SyntaxKind.AmpersandEqualsToken || v = SyntaxKind.BarEqualsToken || v = SyntaxKind.CaretEqualsToken || v = SyntaxKind.LessThanLessThanEqualsToken || v = SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken || v = SyntaxKind.GreaterThanGreaterThanEqualsToken then Some (v :> obj :?> CompoundAssignmentOperator) else None
 
     type AssignmentOperator =
-        U2<SyntaxKind, CompoundAssignmentOperator>
+        U2<EqualsToken, CompoundAssignmentOperator>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module AssignmentOperator =
-        let (|IsSyntaxKind|_|) (v: AssignmentOperator) = match unbox v with SyntaxKind.IsSyntaxKind v -> Some (v :> obj :?> SyntaxKind) | _ -> None
-        let ofSyntaxKind v: AssignmentOperator = v |> U2.Case1
-        let isSyntaxKind (v: AssignmentOperator) = match v with IsSyntaxKind _ -> true | _ -> false
-        let asSyntaxKind (v: AssignmentOperator) = match v with IsSyntaxKind o -> Some o | _ -> None
+        let ts_isEqualsToken (v: Node) = (ts.isToken v && v.kind = SyntaxKind.EqualsToken)
+        let (|IsEqualsToken|_|) (v: AssignmentOperator) = if ts_isEqualsToken (unbox v) then Some (v :> obj :?> EqualsToken) else None
+        let ofEqualsToken v: AssignmentOperator = v |> U2.Case1
+        let isEqualsToken (v: AssignmentOperator) = match v with IsEqualsToken _ -> true | _ -> false
+        let asEqualsToken (v: AssignmentOperator) = match v with IsEqualsToken o -> Some o | _ -> None
         let (|IsCompoundAssignmentOperator|_|) (v: AssignmentOperator) = match unbox v with CompoundAssignmentOperator.IsCompoundAssignmentOperator v -> Some (v :> obj :?> CompoundAssignmentOperator) | _ -> None
         let ofCompoundAssignmentOperator v: AssignmentOperator = v |> U2.Case2
         let isCompoundAssignmentOperator (v: AssignmentOperator) = match v with IsCompoundAssignmentOperator _ -> true | _ -> false
         let asCompoundAssignmentOperator (v: AssignmentOperator) = match v with IsCompoundAssignmentOperator o -> Some o | _ -> None
-        let (|IsAssignmentOperator|_|) v = match unbox v with IsSyntaxKind _ | IsCompoundAssignmentOperator _ -> Some (v :> obj :?> AssignmentOperator) | _ -> None
+        let (|IsAssignmentOperator|_|) v = match unbox v with IsEqualsToken _ | IsCompoundAssignmentOperator _ -> Some (v :> obj :?> AssignmentOperator) | _ -> None
 
     type AssignmentOperatorOrHigher =
         U2<LogicalOperatorOrHigher, AssignmentOperator>
@@ -2252,7 +2277,7 @@ module Ts =
         let (|IsAssignmentOperatorOrHigher|_|) v = match unbox v with IsLogicalOperatorOrHigher _ | IsAssignmentOperator _ -> Some (v :> obj :?> AssignmentOperatorOrHigher) | _ -> None
 
     type BinaryOperator =
-        U2<AssignmentOperatorOrHigher, SyntaxKind>
+        U2<AssignmentOperatorOrHigher, CommaToken>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module BinaryOperator =
@@ -2260,11 +2285,12 @@ module Ts =
         let ofAssignmentOperatorOrHigher v: BinaryOperator = v |> U2.Case1
         let isAssignmentOperatorOrHigher (v: BinaryOperator) = match v with IsAssignmentOperatorOrHigher _ -> true | _ -> false
         let asAssignmentOperatorOrHigher (v: BinaryOperator) = match v with IsAssignmentOperatorOrHigher o -> Some o | _ -> None
-        let (|IsSyntaxKind|_|) (v: BinaryOperator) = match unbox v with SyntaxKind.IsSyntaxKind v -> Some (v :> obj :?> SyntaxKind) | _ -> None
-        let ofSyntaxKind v: BinaryOperator = v |> U2.Case2
-        let isSyntaxKind (v: BinaryOperator) = match v with IsSyntaxKind _ -> true | _ -> false
-        let asSyntaxKind (v: BinaryOperator) = match v with IsSyntaxKind o -> Some o | _ -> None
-        let (|IsBinaryOperator|_|) v = match unbox v with IsAssignmentOperatorOrHigher _ | IsSyntaxKind _ -> Some (v :> obj :?> BinaryOperator) | _ -> None
+        let ts_isCommaToken (v: Node) = (ts.isToken v && v.kind = SyntaxKind.CommaToken)
+        let (|IsCommaToken|_|) (v: BinaryOperator) = if ts_isCommaToken (unbox v) then Some (v :> obj :?> CommaToken) else None
+        let ofCommaToken v: BinaryOperator = v |> U2.Case2
+        let isCommaToken (v: BinaryOperator) = match v with IsCommaToken _ -> true | _ -> false
+        let asCommaToken (v: BinaryOperator) = match v with IsCommaToken o -> Some o | _ -> None
+        let (|IsBinaryOperator|_|) v = match unbox v with IsAssignmentOperatorOrHigher _ | IsCommaToken _ -> Some (v :> obj :?> BinaryOperator) | _ -> None
 
     type BinaryOperatorToken =
         Token<BinaryOperator>
@@ -4511,42 +4537,46 @@ module Ts =
         | Classic = 1
         | NodeJs = 2
 
+    [<Emit("PluginImport")>]
+    let PluginImportClass : obj = jsNative
+
     type [<AllowNullLiteral>] PluginImport =
         abstract name: string with get, set
 
     type CompilerOptionsValue =
-        U7<string, float, bool, ResizeArray<U2<string, float>>, ResizeArray<string>, MapLike<ResizeArray<string>>, ResizeArray<PluginImport>> option
+        U7<string, float, bool, ResizeArray<float>, ResizeArray<string>, MapLike<ResizeArray<string>>, ResizeArray<PluginImport>> option
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module CompilerOptionsValue =
+        let isArray (v: obj) = if Fable.Import.JS.Array.isArray v && (v :?> ResizeArray<obj>).Count > 0 then Some (v :?> ResizeArray<obj>).[0] else None
         let ofStringOption v: CompilerOptionsValue = v |> Option.map U7.Case1
         let ofString v: CompilerOptionsValue = v |> U7.Case1 |> Some
-        let isString (v: CompilerOptionsValue) = match v with None -> false | Some o -> match o with U7.Case1 _ -> true | _ -> false
-        let asString (v: CompilerOptionsValue) = match v with None -> None | Some o -> match o with U7.Case1 o -> Some o | _ -> None
+        let isString (v: CompilerOptionsValue) = match v with None -> false | Some o -> Node.jsTypeof o = "string"
+        let asString (v: CompilerOptionsValue) = if isString v then Some v else None
         let ofFloatOption v: CompilerOptionsValue = v |> Option.map U7.Case2
         let ofFloat v: CompilerOptionsValue = v |> U7.Case2 |> Some
-        let isFloat (v: CompilerOptionsValue) = match v with None -> false | Some o -> match o with U7.Case2 _ -> true | _ -> false
-        let asFloat (v: CompilerOptionsValue) = match v with None -> None | Some o -> match o with U7.Case2 o -> Some o | _ -> None
+        let isFloat (v: CompilerOptionsValue) = match v with None -> false | Some o -> Node.jsTypeof o = "number"
+        let asFloat (v: CompilerOptionsValue) = if isFloat v then Some v else None
         let ofBoolOption v: CompilerOptionsValue = v |> Option.map U7.Case3
         let ofBool v: CompilerOptionsValue = v |> U7.Case3 |> Some
-        let isBool (v: CompilerOptionsValue) = match v with None -> false | Some o -> match o with U7.Case3 _ -> true | _ -> false
-        let asBool (v: CompilerOptionsValue) = match v with None -> None | Some o -> match o with U7.Case3 o -> Some o | _ -> None
-        let ofCase4Option v: CompilerOptionsValue = v |> Option.map U7.Case4
-        let ofCase4 v: CompilerOptionsValue = v |> U7.Case4 |> Some
-        let isCase4 (v: CompilerOptionsValue) = match v with None -> false | Some o -> match o with U7.Case4 _ -> true | _ -> false
-        let asCase4 (v: CompilerOptionsValue) = match v with None -> None | Some o -> match o with U7.Case4 o -> Some o | _ -> None
+        let isBool (v: CompilerOptionsValue) = match v with None -> false | Some o -> Node.jsTypeof o = "boolean"
+        let asBool (v: CompilerOptionsValue) = if isBool v then Some v else None
+        let ofFloatArrayOption v: CompilerOptionsValue = v |> Option.map U7.Case4
+        let ofFloatArray v: CompilerOptionsValue = v |> U7.Case4 |> Some
+        let isFloatArray (v: CompilerOptionsValue) = match v with None -> false | Some o -> match isArray o with Some o when Node.jsTypeof o = "number" -> true | _ -> false
+        let asFloatArray (v: CompilerOptionsValue) = if isFloatArray v then Some v else None
         let ofStringArrayOption v: CompilerOptionsValue = v |> Option.map U7.Case5
         let ofStringArray v: CompilerOptionsValue = v |> U7.Case5 |> Some
-        let isStringArray (v: CompilerOptionsValue) = match v with None -> false | Some o -> match o with U7.Case5 _ -> true | _ -> false
-        let asStringArray (v: CompilerOptionsValue) = match v with None -> None | Some o -> match o with U7.Case5 o -> Some o | _ -> None
+        let isStringArray (v: CompilerOptionsValue) = match v with None -> false | Some o ->  match isArray o with Some o when Node.jsTypeof o = "string" -> true | _ -> false
+        let asStringArray (v: CompilerOptionsValue) = if isStringArray v then Some v else None
         let ofMapLikeOption v: CompilerOptionsValue = v |> Option.map U7.Case6
         let ofMapLike v: CompilerOptionsValue = v |> U7.Case6 |> Some
-        let isMapLike (v: CompilerOptionsValue) = match v with None -> false | Some o -> match o with U7.Case6 _ -> true | _ -> false
-        let asMapLike (v: CompilerOptionsValue) = match v with None -> None | Some o -> match o with U7.Case6 o -> Some o | _ -> None
+        let isMapLike (v: CompilerOptionsValue) = match v with None -> false | Some o -> not (Fable.Import.JS.Array.isArray v) && Node.jsTypeof o = "object"
+        let asMapLike (v: CompilerOptionsValue) = if isMapLike v then Some v else None
         let ofPluginImportArrayOption v: CompilerOptionsValue = v |> Option.map U7.Case7
         let ofPluginImportArray v: CompilerOptionsValue = v |> U7.Case7 |> Some
-        let isPluginImportArray (v: CompilerOptionsValue) = match v with None -> false | Some o -> match o with U7.Case7 _ -> true | _ -> false
-        let asPluginImportArray (v: CompilerOptionsValue) = match v with None -> None | Some o -> match o with U7.Case7 o -> Some o | _ -> None
+        let isPluginImportArray (v: CompilerOptionsValue) = match v with None -> false | Some o -> match isArray o with Some o when Node.jsInstanceof o PluginImportClass -> true | _ -> false
+        let asPluginImportArray (v: CompilerOptionsValue) = if isPluginImportArray v then Some v else None
 
     type [<AllowNullLiteral>] CompilerOptions =
         abstract allowJs: bool option with get, set
@@ -4911,12 +4941,12 @@ module Ts =
     module VisitResult =
         let ofTOption v: VisitResult<'T> = v |> Option.map U2.Case1
         let ofT v: VisitResult<'T> = v |> U2.Case1 |> Some
-        let isT (v: VisitResult<'T>) = match v with None -> false | Some o -> match o with U2.Case1 _ -> true | _ -> false
-        let asT (v: VisitResult<'T>) = match v with None -> None | Some o -> match o with U2.Case1 o -> Some o | _ -> None
+        let isT (v: VisitResult<'T>) = match v with None -> false | Some o -> not (Fable.Import.JS.Array.isArray v) 
+        let asT (v: VisitResult<'T>) = match v with o when isT o -> Some o | _ -> None
         let ofTArrayOption v: VisitResult<'T> = v |> Option.map U2.Case2
         let ofTArray v: VisitResult<'T> = v |> U2.Case2 |> Some
-        let isTArray (v: VisitResult<'T>) = match v with None -> false | Some o -> match o with U2.Case2 _ -> true | _ -> false
-        let asTArray (v: VisitResult<'T>) = match v with None -> None | Some o -> match o with U2.Case2 o -> Some o | _ -> None
+        let isTArray (v: VisitResult<'T>) = match v with None -> false | Some o -> Fable.Import.JS.Array.isArray v
+        let asTArray (v: VisitResult<'T>) = match v with o when isTArray o -> Some o | _ -> None
 
     type [<AllowNullLiteral>] Printer =
         /// <summary>Print a node and its subtree as-is, without any emit transformations.</summary>
