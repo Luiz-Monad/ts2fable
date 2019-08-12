@@ -8,6 +8,17 @@ open System.Collections.Generic
 open System
 open ts2fable.Naming
 
+let inline toJson<'T> (o: 'T) =
+    let a =
+        Fable.Import.JS.Object.keys o
+        |> Seq.map ( fun key ->
+            !! ( key, o?(key).ToString()
+                .Replace("[object Object]", "...")
+                .Replace("[object Map]", "...") )
+        )
+        |> keyValueList CaseRules.LowerFirst
+    Thoth.Json.Encode.Auto.toString (0, a)
+    
 type Node with
     member x.ForEachChild (cbNode: Node -> unit) =
         x.forEachChild<unit> (fun nd -> cbNode nd; None) |> ignore
@@ -25,25 +36,25 @@ let getAccessibility (modifiersOpt: ModifiersArray option) : FsAccessibility opt
             None
     | None -> None
 
-let getPropertyName(pn: PropertyName): string =
+let getPropertyName (pn: PropertyName): string =
     match pn with
     | PropertyName.IsIdentifier id -> id.getText() |> removeQuotes
     | PropertyName.IsStringLiteral sl -> sl.getText()
     | PropertyName.IsNumericLiteral nl -> nl.getText()
     | PropertyName.IsComputedPropertyName cpn -> cpn.getText()
-    | _ -> failwithf "invalid property name %A" pn
+    | _ -> failwithf "invalid PropertyName %A" (toJson pn)
 
-let getBindingName(bn: BindingName): string =
+let getBindingName (bn: BindingName): string =
     match bn with
     | BindingName.IsIdentifier id -> id.getText()
     | BindingName.IsBindingPattern bp -> // BindingPattern
         match bp with
         | BindingPattern.IsObjectBindingPattern obp -> obp.getText()
         | BindingPattern.IsArrayBindingPattern abp -> abp.getText()
-        | _ -> failwithf "invalid property name %A" bp
-    | _ -> failwithf "invalid property name %A" bn
+        | _ -> failwithf "invalid BindingName %A" (toJson bp)
+    | _ -> failwithf "invalid BindingName %A" (toJson bn)
 
-let readEnumCase(em: EnumMember): FsEnumCase =
+let readEnumCase (em: EnumMember): FsEnumCase =
     let name = em.name |> getPropertyName
     let tp, value =
         match em.initializer with
@@ -65,7 +76,7 @@ let readEnumCase(em: EnumMember): FsEnumCase =
                     FsEnumCaseType.Numeric, Some txt
                 else
                     FsEnumCaseType.Unknown, None
-            | _ -> failwithf "EnumCase type not supported %A %A" ep.kind name
+            | _ -> failwithf "invalid EnumCase %A %A" name (toJson ep)
     {
         Name = name
         Type = tp
@@ -84,7 +95,7 @@ let readTypeParameters (checker: TypeChecker) (tps: List<TypeParameterDeclaratio
                     Name = tp.name.getText()
                     FullName = getFullNodeName checker tp
                 }
-                |> FsType.GenericParameterDefaults              
+                |> FsType.GenericParameterDefaults
             | None ->
                 {
                     Name = tp.name.getText()
@@ -136,7 +147,7 @@ let readCommentTags (nd: Node) =
                 | None -> []
                 | Some comment -> [{ Name = ""; Description = readCommentLines comment} |> FsComment.Param]
             | _ ->
-                // printfn "uknown comment kind tag kind %A %A" tag.kind tag.comment
+                // printfn "unknown comment kind tag kind %A %A" tag.kind tag.comment
                 [tag.comment |> FsComment.Unknown]
         )
 
@@ -226,7 +237,7 @@ let readVariable (checker: TypeChecker) (vb: VariableStatement) =
         |> FsType.Variable
     )
 
-let readEnum(ed: EnumDeclaration): FsEnum =
+let readEnum (ed: EnumDeclaration): FsEnum =
     {
         Name = ed.name.getText()
         Cases = ed.members |> List.ofSeq |> List.map readEnumCase
@@ -327,7 +338,7 @@ let rec readTypeNode (checker: TypeChecker) (t: TypeNode): FsType =
             Types = itp.types |> List.ofSeq |> List.map (readTypeNode checker)
             Kind = FsTupleKind.Intersection
         }
-        |> FsType.Tuple        
+        |> FsType.Tuple
     | SyntaxKind.IndexedAccessType ->
         let ia = t :?> IndexedAccessTypeNode
         readTypeNode checker ia.objectType
@@ -345,7 +356,7 @@ let rec readTypeNode (checker: TypeChecker) (t: TypeNode): FsType =
         | TypeNodeLiteral.IsBooleanLiteral bl -> readLiteralKind bl.kind (bl.getText())
         | TypeNodeLiteral.IsLiteralExpression le -> readLiteralKind le.kind (le.getText())
         | TypeNodeLiteral.IsPrefixUnaryExpression pue -> readLiteralKind pue.kind (pue.getText())
-        | _ -> failwithf "invalid literal name %A" lt
+        | _ -> failwithf "invalid LiteralType %A" (toJson lt)
     | SyntaxKind.ExpressionWithTypeArguments ->
         let eta = t :?> ExpressionWithTypeArguments
         let tp = checker.getTypeFromTypeNode eta
@@ -374,10 +385,10 @@ let rec readTypeNode (checker: TypeChecker) (t: TypeNode): FsType =
     | SyntaxKind.NullKeyword -> FsType.TODO // It should be an option
     | SyntaxKind.ObjectKeyword -> simpleType "obj"
     | SyntaxKind.TypeOperator ->
-        printfn "unsupported TypeNode TypeOperator: %A" t
+        printfn "unsupported TypeNode TypeOperator: %A" (toJson t)
         FsType.TODO // jQuery
     | _ ->
-        printfn "unsupported TypeNode kind: %A" t.kind
+        printfn "unsupported TypeNode kind: %A" (toJson t)
         FsType.TODO
 
 let readParameterDeclaration (checker: TypeChecker) (pd: ParameterDeclaration): FsParam =
@@ -464,7 +475,7 @@ let readPropertyNameComments (checker: TypeChecker) (pn: PropertyName): FsCommen
     | PropertyName.IsStringLiteral sl -> readCommentsAtLocation checker sl
     | PropertyName.IsNumericLiteral nl -> readCommentsAtLocation checker nl
     | PropertyName.IsComputedPropertyName cpn -> readCommentsAtLocation checker cpn
-    | _ -> failwithf "invalid property name %A" pn
+    | _ -> failwithf "invalid PropertyName %A" (toJson pn)
 
 let readPropertyDeclaration (checker: TypeChecker) (pd: PropertyDeclaration): FsProperty =
     {
@@ -483,7 +494,7 @@ let readPropertyDeclaration (checker: TypeChecker) (pd: PropertyDeclaration): Fs
     }
 
 let readFunctionDeclaration (checker: TypeChecker) (fd: FunctionDeclaration): FsFunction =
-    {     
+    {
         Comments = readCommentsForSignatureDeclaration checker (SignatureDeclaration.ofFunctionDeclaration fd)
         Kind = FsFunctionKind.Regular
         IsStatic = hasModifier SyntaxKind.StaticKeyword fd.modifiers
@@ -571,7 +582,7 @@ let readNamedDeclaration (checker: TypeChecker) (te: NamedDeclaration): FsType =
         readPropertyDeclaration checker (te :?> PropertyDeclaration) |> FsType.Property
     | SyntaxKind.MethodDeclaration ->
         readMethodDeclaration checker (te :?> MethodDeclaration) |> FsType.Function
-    | _ -> printfn "unsupported NamedDeclaration kind: %A" te.kind; FsType.TODO
+    | _ -> printfn "unsupported NamedDeclaration kind: %A" (toJson te); FsType.TODO
 
 let readAliasDeclaration (checker: TypeChecker) (d: TypeAliasDeclaration): FsType =
     let tp = d.``type`` |> (readTypeNode checker)
@@ -602,7 +613,7 @@ let readAliasDeclaration (checker: TypeChecker) (d: TypeAliasDeclaration): FsTyp
         else asAlias()
     | _ -> asAlias()
 
-let readExpressionText(ep: Expression): string =
+let readExpressionText (ep: Expression): string =
     match ep.kind with
     | SyntaxKind.Identifier ->
         let id = ep :?> Identifier
@@ -611,7 +622,7 @@ let readExpressionText(ep: Expression): string =
         let pa = ep :?> PropertyAccessExpression
         pa.getText()
     | _ ->
-        printfn "readExpressionText kind not yet supported: %A" ep.kind
+        printfn "readExpressionText kind not yet supported: %A" (toJson ep)
         ep.getText()
 
 let readExportAssignment(ea: ExportAssignment): FsType =
@@ -621,7 +632,7 @@ let readExportAssignment(ea: ExportAssignment): FsType =
         FsType.ExportAssignment path
     | _ -> FsType.None
 
-let readImportDeclaration(im: ImportDeclaration): FsType list =
+let readImportDeclaration (im: ImportDeclaration): FsType list =
     let moduleSpecifier = im.moduleSpecifier.getText() |> removeQuotes
     match im.importClause with
     | None -> []
@@ -657,10 +668,10 @@ let readImportDeclaration(im: ImportDeclaration): FsType list =
                         | _ -> []
                     )
             | NamedImportBindings.IsNamedImports _ -> []
-            | _ -> failwithf "invalid named binding import %A" cl
+            | _ -> failwithf "invalid NamedImportBinding import %A" (toJson cl)
 
 let readStatement (checker: TypeChecker) (sd: Statement): FsType list =
-    //printfn "\n%s readStatement %A\n%s\n\n" (sd.getSourceFile().fileName) sd (sd.getText())
+    //printfn "DEBUG: %s readStatement %A\n%s\n\n" (sd.getSourceFile().fileName) (toJson sd) (sd.getText().ToString().Substring(0, 250))
 
     match sd.kind with
     | SyntaxKind.InterfaceDeclaration ->
@@ -678,9 +689,9 @@ let readStatement (checker: TypeChecker) (sd: Statement): FsType list =
     | SyntaxKind.ModuleDeclaration ->
         [readModuleDeclaration checker (sd :?> ModuleDeclaration) |> FsType.Module]
     | SyntaxKind.ExportAssignment ->
-        [readExportAssignment(sd :?> ExportAssignment)]
+        [readExportAssignment (sd :?> ExportAssignment)]
     | SyntaxKind.ImportDeclaration ->
-        readImportDeclaration(sd :?> ImportDeclaration)
+        readImportDeclaration (sd :?> ImportDeclaration)
     | SyntaxKind.NamespaceExportDeclaration ->
         // let ns = sd :?> NamespaceExportDeclaration
         []
@@ -697,14 +708,14 @@ let readStatement (checker: TypeChecker) (sd: Statement): FsType list =
     // | SyntaxKind.ExpressionStatement ->
     //     let es = sd :?> ExpressionStatement
     //     printfn "\n%s unsupported %A\n%s\n\n" (sd.getSourceFile().fileName) es (sd.getText()); []
-    
-    | _ -> printfn "%s unsupported Statement kind: %A" (sd.getSourceFile().fileName) sd; []
 
-let readModuleName(mn: ModuleName): string =
+    | _ -> printfn "%s unsupported Statement kind: %A" (sd.getSourceFile().fileName) (toJson sd); []
+
+let readModuleName (mn: ModuleName): string =
     match mn with
     | ModuleName.IsIdentifier id -> id.getText().Replace("\"","")
     | ModuleName.IsStringLiteral sl -> sl.getText()
-    | _ -> failwithf "invalid module name %A" mn
+    | _ -> failwithf "invalid module name %A" (toJson mn)
 
 let rec readModuleDeclaration checker (md: ModuleDeclaration): FsModule =
     let types = List()
@@ -719,7 +730,7 @@ let rec readModuleDeclaration checker (md: ModuleDeclaration): FsModule =
             readModuleDeclaration checker (nd :?> ModuleDeclaration) |> FsType.Module |> types.Add
         | SyntaxKind.StringLiteral -> ()
         | SyntaxKind.ExportKeyword -> ()
-        | _ -> printfn "unknown kind in ModuleDeclaration: %A" nd.kind
+        | _ -> printfn "unknown kind in ModuleDeclaration: %A" (toJson nd)
     )
     {
         HasDeclare = hasModifier SyntaxKind.DeclareKeyword md.modifiers

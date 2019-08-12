@@ -45,13 +45,13 @@ type internal Bridge =
 
 [<RequireQualifiedAccess>]
 module internal Bridge =
-   
+
     let private fsFileKind tsPath =
         function
         | Bridge.Node nb -> 
             nb.GetFsFileKind (nb,tsPath)
-
         | Bridge.Web w -> FsFileKind.Index
+
     let private getTsPaths = 
         function
         | Bridge.Node nb -> nb.TsPaths
@@ -71,7 +71,7 @@ module internal Bridge =
                 )                
         | Bridge.Web w -> [w.FileName]
 
-    let private getNamespace =      
+    let private getNamespace =
         function
         | Bridge.Node nb -> nb.NameSpace
         | Bridge.Web _ -> "moduleName" 
@@ -102,7 +102,7 @@ module internal Bridge =
             let sourceFiles = 
                 exports |> List.map (fun tsPath ->
                     let text = tsPath |> readText
-                    ts.createSourceFile (tsPath,text, scriptTarget, true)
+                    ts.createSourceFile (tsPath, text, scriptTarget, true)
                 )
             createDummy exports sourceFiles
 

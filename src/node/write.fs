@@ -17,6 +17,7 @@ open ts2fable.Syntax
 open ts2fable.node.FileSystem
 open ts2fable.Bridges
 open ts2fable.node.Transform
+
 let getFsFileOut (fsPath: string) (tsPaths: string list) (exports: string list) = 
     {
         FixNamespace = fixNamespace
@@ -59,6 +60,7 @@ let emitFsFileOutAsLines (fsPath: string) (fsFileOut: FsFileOut) =
 let emitFsFileOut fsPath (fsFileOut: FsFileOut) = 
     emitFsFileOutAsLines fsPath fsFileOut
     |> ignore
+
 let writeFile (tsPaths: string list) (fsPath: string) exports: unit =
     // printfn "writeFile %A %s" tsPaths fsPath
     let fsFileOut = getFsFileOut fsPath tsPaths exports
