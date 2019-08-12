@@ -1172,6 +1172,10 @@ module Ts =
         | FirstJSDocTagNode = 276
         | LastJSDocTagNode = 285
 
+    [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+    module SyntaxKind =
+        let (|IsSyntaxKind|_|) (v: obj) = match Int32.TryParse(string v) with (true, _) -> Some (v :?> SyntaxKind) | _ -> None
+
     type [<RequireQualifiedAccess>] NodeFlags =
         | None = 0
         | Let = 1
@@ -1325,51 +1329,65 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module EntityName =
+        let (|IsIdentifier|_|) (v: EntityName) = if ts.isIdentifier (unbox v) then Some (v :> obj :?> Identifier) else None
         let ofIdentifier v: EntityName = v |> U2.Case1
-        let isIdentifier (v: EntityName) = match v with U2.Case1 _ -> true | _ -> false
-        let asIdentifier (v: EntityName) = match v with U2.Case1 o -> Some o | _ -> None
+        let isIdentifier (v: EntityName) = match v with IsIdentifier _ -> true | _ -> false
+        let asIdentifier (v: EntityName) = match v with IsIdentifier o -> Some o | _ -> None
+        let (|IsQualifiedName|_|) (v: EntityName) = if ts.isQualifiedName (unbox v) then Some (v :> obj :?> QualifiedName) else None
         let ofQualifiedName v: EntityName = v |> U2.Case2
-        let isQualifiedName (v: EntityName) = match v with U2.Case2 _ -> true | _ -> false
-        let asQualifiedName (v: EntityName) = match v with U2.Case2 o -> Some o | _ -> None
+        let isQualifiedName (v: EntityName) = match v with IsQualifiedName _ -> true | _ -> false
+        let asQualifiedName (v: EntityName) = match v with IsQualifiedName o -> Some o | _ -> None
+        let (|IsEntityName|_|) v = match unbox v with IsIdentifier _ | IsQualifiedName _ -> Some (v :> obj :?> EntityName) | _ -> None
 
     type PropertyName =
         U4<Identifier, StringLiteral, NumericLiteral, ComputedPropertyName>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module PropertyName =
+        let (|IsIdentifier|_|) (v: PropertyName) = if ts.isIdentifier (unbox v) then Some (v :> obj :?> Identifier) else None
         let ofIdentifier v: PropertyName = v |> U4.Case1
-        let isIdentifier (v: PropertyName) = match v with U4.Case1 _ -> true | _ -> false
-        let asIdentifier (v: PropertyName) = match v with U4.Case1 o -> Some o | _ -> None
+        let isIdentifier (v: PropertyName) = match v with IsIdentifier _ -> true | _ -> false
+        let asIdentifier (v: PropertyName) = match v with IsIdentifier o -> Some o | _ -> None
+        let (|IsStringLiteral|_|) (v: PropertyName) = if ts.isStringLiteral (unbox v) then Some (v :> obj :?> StringLiteral) else None
         let ofStringLiteral v: PropertyName = v |> U4.Case2
-        let isStringLiteral (v: PropertyName) = match v with U4.Case2 _ -> true | _ -> false
-        let asStringLiteral (v: PropertyName) = match v with U4.Case2 o -> Some o | _ -> None
+        let isStringLiteral (v: PropertyName) = match v with IsStringLiteral _ -> true | _ -> false
+        let asStringLiteral (v: PropertyName) = match v with IsStringLiteral o -> Some o | _ -> None
+        let (|IsNumericLiteral|_|) (v: PropertyName) = if ts.isNumericLiteral (unbox v) then Some (v :> obj :?> NumericLiteral) else None
         let ofNumericLiteral v: PropertyName = v |> U4.Case3
-        let isNumericLiteral (v: PropertyName) = match v with U4.Case3 _ -> true | _ -> false
-        let asNumericLiteral (v: PropertyName) = match v with U4.Case3 o -> Some o | _ -> None
+        let isNumericLiteral (v: PropertyName) = match v with IsNumericLiteral _ -> true | _ -> false
+        let asNumericLiteral (v: PropertyName) = match v with IsNumericLiteral o -> Some o | _ -> None
+        let (|IsComputedPropertyName|_|) (v: PropertyName) = if ts.isComputedPropertyName (unbox v) then Some (v :> obj :?> ComputedPropertyName) else None
         let ofComputedPropertyName v: PropertyName = v |> U4.Case4
-        let isComputedPropertyName (v: PropertyName) = match v with U4.Case4 _ -> true | _ -> false
-        let asComputedPropertyName (v: PropertyName) = match v with U4.Case4 o -> Some o | _ -> None
+        let isComputedPropertyName (v: PropertyName) = match v with IsComputedPropertyName _ -> true | _ -> false
+        let asComputedPropertyName (v: PropertyName) = match v with IsComputedPropertyName o -> Some o | _ -> None
+        let (|IsPropertyName|_|) v = match unbox v with IsIdentifier _ | IsStringLiteral _ | IsNumericLiteral _ | IsComputedPropertyName _ -> Some (v :> obj :?> PropertyName) | _ -> None
 
     type DeclarationName =
         U5<Identifier, StringLiteral, NumericLiteral, ComputedPropertyName, BindingPattern>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module DeclarationName =
+        let (|IsIdentifier|_|) (v: DeclarationName) = if ts.isIdentifier (unbox v) then Some (v :> obj :?> Identifier) else None
         let ofIdentifier v: DeclarationName = v |> U5.Case1
-        let isIdentifier (v: DeclarationName) = match v with U5.Case1 _ -> true | _ -> false
-        let asIdentifier (v: DeclarationName) = match v with U5.Case1 o -> Some o | _ -> None
+        let isIdentifier (v: DeclarationName) = match v with IsIdentifier _ -> true | _ -> false
+        let asIdentifier (v: DeclarationName) = match v with IsIdentifier o -> Some o | _ -> None
+        let (|IsStringLiteral|_|) (v: DeclarationName) = if ts.isStringLiteral (unbox v) then Some (v :> obj :?> StringLiteral) else None
         let ofStringLiteral v: DeclarationName = v |> U5.Case2
-        let isStringLiteral (v: DeclarationName) = match v with U5.Case2 _ -> true | _ -> false
-        let asStringLiteral (v: DeclarationName) = match v with U5.Case2 o -> Some o | _ -> None
+        let isStringLiteral (v: DeclarationName) = match v with IsStringLiteral _ -> true | _ -> false
+        let asStringLiteral (v: DeclarationName) = match v with IsStringLiteral o -> Some o | _ -> None
+        let (|IsNumericLiteral|_|) (v: DeclarationName) = if ts.isNumericLiteral (unbox v) then Some (v :> obj :?> NumericLiteral) else None
         let ofNumericLiteral v: DeclarationName = v |> U5.Case3
-        let isNumericLiteral (v: DeclarationName) = match v with U5.Case3 _ -> true | _ -> false
-        let asNumericLiteral (v: DeclarationName) = match v with U5.Case3 o -> Some o | _ -> None
+        let isNumericLiteral (v: DeclarationName) = match v with IsNumericLiteral _ -> true | _ -> false
+        let asNumericLiteral (v: DeclarationName) = match v with IsNumericLiteral o -> Some o | _ -> None
+        let (|IsComputedPropertyName|_|) (v: DeclarationName) = if ts.isComputedPropertyName (unbox v) then Some (v :> obj :?> ComputedPropertyName) else None
         let ofComputedPropertyName v: DeclarationName = v |> U5.Case4
-        let isComputedPropertyName (v: DeclarationName) = match v with U5.Case4 _ -> true | _ -> false
-        let asComputedPropertyName (v: DeclarationName) = match v with U5.Case4 o -> Some o | _ -> None
+        let isComputedPropertyName (v: DeclarationName) = match v with IsComputedPropertyName _ -> true | _ -> false
+        let asComputedPropertyName (v: DeclarationName) = match v with IsComputedPropertyName o -> Some o | _ -> None
+        let (|IsBindingPattern|_|) (v: DeclarationName) = match unbox v with BindingPattern.IsBindingPattern v -> Some (v :> obj :?> BindingPattern) | _ -> None
         let ofBindingPattern v: DeclarationName = v |> U5.Case5
-        let isBindingPattern (v: DeclarationName) = match v with U5.Case5 _ -> true | _ -> false
-        let asBindingPattern (v: DeclarationName) = match v with U5.Case5 o -> Some o | _ -> None
+        let isBindingPattern (v: DeclarationName) = match v with IsBindingPattern _ -> true | _ -> false
+        let asBindingPattern (v: DeclarationName) = match v with IsBindingPattern o -> Some o | _ -> None
+        let (|IsDeclarationName|_|) v = match unbox v with IsIdentifier _ | IsStringLiteral _ | IsNumericLiteral _ | IsComputedPropertyName _ | IsBindingPattern _ -> Some (v :> obj :?> DeclarationName) | _ -> None
 
     type [<AllowNullLiteral>] Declaration =
         inherit Node
@@ -1407,14 +1425,33 @@ module Ts =
     type [<AllowNullLiteral>] SignatureDeclarationBase =
         inherit NamedDeclaration
         inherit JSDocContainer
-        abstract kind: obj with get, set
+        abstract kind: SyntaxKind with get, set
         abstract name: PropertyName option with get, set
         abstract typeParameters: ResizeArray<TypeParameterDeclaration> option with get, set
         abstract parameters: ResizeArray<ParameterDeclaration> with get, set
         abstract ``type``: TypeNode option with get, set
 
-    type SignatureDeclaration =
-        obj
+    type [<AllowNullLiteral>] SignatureDeclaration =
+        inherit SignatureDeclarationBase
+        inherit TypeElement
+        abstract kind: SyntaxKind with get, set
+
+    [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+    module SignatureDeclaration =
+        let (|IsCallSignatureDeclaration|_|) (v: Node) = if ts.isCallSignatureDeclaration (unbox v) then Some (v :> obj :?> CallSignatureDeclaration) else None
+        let (|IsConstructSignatureDeclaration|_|) (v: Node) = if ts.isConstructSignatureDeclaration (unbox v) then Some (v :> obj :?> ConstructSignatureDeclaration) else None
+        let (|IsMethodSignature|_|) (v: Node) = if ts.isMethodSignature (unbox v) then Some (v :> obj :?> MethodSignature) else None
+        let (|IsIndexSignatureDeclaration|_|) (v: Node) = if ts.isIndexSignatureDeclaration (unbox v) then Some (v :> obj :?> IndexSignatureDeclaration) else None
+        let (|IsFunctionTypeNode|_|) (v: Node) = if ts.isFunctionTypeNode (unbox v) then Some (v :> obj :?> FunctionTypeNode) else None
+        let (|IsConstructorTypeNode|_|) (v: Node) = if ts.isConstructorTypeNode (unbox v) then Some (v :> obj :?> ConstructorTypeNode) else None
+        let (|IsJSDocFunctionType|_|) (v: Node) = if ts.isJSDocFunctionType (unbox v) then Some (v :> obj :?> JSDocFunctionType) else None
+        let (|IsFunctionDeclaration|_|) (v: Node) = if ts.isFunctionDeclaration (unbox v) then Some (v :> obj :?> FunctionDeclaration) else None
+        let (|IsMethodDeclaration|_|) (v: Node) = if ts.isMethodDeclaration (unbox v) then Some (v :> obj :?> MethodDeclaration) else None
+        let (|IsConstructorDeclaration|_|) (v: Node) = if ts.isConstructorDeclaration (unbox v) then Some (v :> obj :?> ConstructorDeclaration) else None
+        let (|IsAccessorDeclaration|_|) (v: Node) = match unbox v with AccessorDeclaration.IsAccessorDeclaration v -> Some (v :> obj :?> AccessorDeclaration) | _ -> None
+        let (|IsFunctionExpression|_|) (v: Node) = if ts.isFunctionExpression (unbox v) then Some (v :> obj :?> FunctionExpression) else None
+        let (|IsArrowFunction|_|) (v: Node) = if ts.isArrowFunction (unbox v) then Some (v :> obj :?> ArrowFunction) else None
+        let (|IsSignatureDeclaration|_|) v = match unbox v with IsCallSignatureDeclaration _ | IsConstructSignatureDeclaration _ | IsMethodSignature _ | IsIndexSignatureDeclaration _ | IsFunctionTypeNode _ | IsConstructorTypeNode _ | IsJSDocFunctionType _ | IsFunctionDeclaration _ | IsMethodDeclaration _ | IsConstructorDeclaration _ | IsAccessorDeclaration _ | IsFunctionExpression _ | IsConstructSignatureDeclaration _ | IsConstructSignatureDeclaration _ | IsArrowFunction _ -> Some (v :> obj :?> BindingName) | _ -> None
 
     type [<AllowNullLiteral>] CallSignatureDeclaration =
         inherit SignatureDeclarationBase
@@ -1431,12 +1468,15 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module BindingName =
+        let (|IsIdentifier|_|) (v: BindingName) = if ts.isIdentifier (unbox v) then Some (v :> obj :?> Identifier) else None
         let ofIdentifier v: BindingName = v |> U2.Case1
-        let isIdentifier (v: BindingName) = match v with U2.Case1 _ -> true | _ -> false
-        let asIdentifier (v: BindingName) = match v with U2.Case1 o -> Some o | _ -> None
+        let isIdentifier (v: BindingName) = match v with IsIdentifier _ -> true | _ -> false
+        let asIdentifier (v: BindingName) = match v with IsIdentifier o -> Some o | _ -> None
+        let (|IsBindingPattern|_|) (v: BindingName) = match unbox v with BindingPattern.IsBindingPattern v -> Some (v :> obj :?> BindingPattern) | _ -> None
         let ofBindingPattern v: BindingName = v |> U2.Case2
-        let isBindingPattern (v: BindingName) = match v with U2.Case2 _ -> true | _ -> false
-        let asBindingPattern (v: BindingName) = match v with U2.Case2 o -> Some o | _ -> None
+        let isBindingPattern (v: BindingName) = match v with IsBindingPattern _ -> true | _ -> false
+        let asBindingPattern (v: BindingName) = match v with IsBindingPattern o -> Some o | _ -> None
+        let (|IsBindingName|_|) v = match unbox v with IsIdentifier _ | IsBindingPattern _ -> Some (v :> obj :?> BindingName) | _ -> None
 
     type [<AllowNullLiteral>] VariableDeclaration =
         inherit NamedDeclaration
@@ -1500,21 +1540,27 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module ObjectLiteralElementLike =
+        let (|IsPropertyAssignment|_|) (v: ObjectLiteralElementLike) = if ts.isPropertyAssignment (unbox v) then Some (v :> obj :?> PropertyAssignment) else None
         let ofPropertyAssignment v: ObjectLiteralElementLike = v |> U5.Case1
-        let isPropertyAssignment (v: ObjectLiteralElementLike) = match v with U5.Case1 _ -> true | _ -> false
-        let asPropertyAssignment (v: ObjectLiteralElementLike) = match v with U5.Case1 o -> Some o | _ -> None
+        let isPropertyAssignment (v: ObjectLiteralElementLike) = match v with IsPropertyAssignment _ -> true | _ -> false
+        let asPropertyAssignment (v: ObjectLiteralElementLike) = match v with IsPropertyAssignment o -> Some o | _ -> None
+        let (|IsShorthandPropertyAssignment|_|) (v: ObjectLiteralElementLike) = if ts.isShorthandPropertyAssignment (unbox v) then Some (v :> obj :?> ShorthandPropertyAssignment) else None
         let ofShorthandPropertyAssignment v: ObjectLiteralElementLike = v |> U5.Case2
-        let isShorthandPropertyAssignment (v: ObjectLiteralElementLike) = match v with U5.Case2 _ -> true | _ -> false
-        let asShorthandPropertyAssignment (v: ObjectLiteralElementLike) = match v with U5.Case2 o -> Some o | _ -> None
+        let isShorthandPropertyAssignment (v: ObjectLiteralElementLike) = match v with IsShorthandPropertyAssignment _ -> true | _ -> false
+        let asShorthandPropertyAssignment (v: ObjectLiteralElementLike) = match v with IsShorthandPropertyAssignment o -> Some o | _ -> None
+        let (|IsSpreadAssignment|_|) (v: ObjectLiteralElementLike) = if ts.isSpreadAssignment (unbox v) then Some (v :> obj :?> SpreadAssignment) else None
         let ofSpreadAssignment v: ObjectLiteralElementLike = v |> U5.Case3
-        let isSpreadAssignment (v: ObjectLiteralElementLike) = match v with U5.Case3 _ -> true | _ -> false
-        let asSpreadAssignment (v: ObjectLiteralElementLike) = match v with U5.Case3 o -> Some o | _ -> None
+        let isSpreadAssignment (v: ObjectLiteralElementLike) = match v with IsSpreadAssignment _ -> true | _ -> false
+        let asSpreadAssignment (v: ObjectLiteralElementLike) = match v with IsSpreadAssignment o -> Some o | _ -> None
+        let (|IsMethodDeclaration|_|) (v: ObjectLiteralElementLike) = if ts.isMethodDeclaration (unbox v) then Some (v :> obj :?> MethodDeclaration) else None
         let ofMethodDeclaration v: ObjectLiteralElementLike = v |> U5.Case4
-        let isMethodDeclaration (v: ObjectLiteralElementLike) = match v with U5.Case4 _ -> true | _ -> false
-        let asMethodDeclaration (v: ObjectLiteralElementLike) = match v with U5.Case4 o -> Some o | _ -> None
+        let isMethodDeclaration (v: ObjectLiteralElementLike) = match v with IsMethodDeclaration _ -> true | _ -> false
+        let asMethodDeclaration (v: ObjectLiteralElementLike) = match v with IsMethodDeclaration o -> Some o | _ -> None
+        let (|IsAccessorDeclaration|_|) (v: ObjectLiteralElementLike) = match unbox v with AccessorDeclaration.IsAccessorDeclaration v -> Some (v :> obj :?> AccessorDeclaration) | _ -> None
         let ofAccessorDeclaration v: ObjectLiteralElementLike = v |> U5.Case5
-        let isAccessorDeclaration (v: ObjectLiteralElementLike) = match v with U5.Case5 _ -> true | _ -> false
-        let asAccessorDeclaration (v: ObjectLiteralElementLike) = match v with U5.Case5 o -> Some o | _ -> None
+        let isAccessorDeclaration (v: ObjectLiteralElementLike) = match v with IsAccessorDeclaration _ -> true | _ -> false
+        let asAccessorDeclaration (v: ObjectLiteralElementLike) = match v with IsAccessorDeclaration o -> Some o | _ -> None
+        let (|IsObjectLiteralElementLike|_|) v = match unbox v with IsPropertyAssignment _ | IsShorthandPropertyAssignment _ | IsSpreadAssignment _ | IsMethodDeclaration _ | IsAccessorDeclaration _ -> Some (v :> obj :?> ObjectLiteralElementLike) | _ -> None
 
     type [<AllowNullLiteral>] PropertyAssignment =
         inherit ObjectLiteralElement
@@ -1572,24 +1618,30 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module BindingPattern =
+        let (|IsObjectBindingPattern|_|) (v: BindingPattern) = if ts.isObjectBindingPattern (unbox v) then Some (v :> obj :?> ObjectBindingPattern) else None
         let ofObjectBindingPattern v: BindingPattern = v |> U2.Case1
-        let isObjectBindingPattern (v: BindingPattern) = match v with U2.Case1 _ -> true | _ -> false
-        let asObjectBindingPattern (v: BindingPattern) = match v with U2.Case1 o -> Some o | _ -> None
+        let isObjectBindingPattern (v: BindingPattern) = match v with IsObjectBindingPattern _ -> true | _ -> false
+        let asObjectBindingPattern (v: BindingPattern) = match v with IsObjectBindingPattern o -> Some o | _ -> None
+        let (|IsArrayBindingPattern|_|) (v: BindingPattern) = if ts.isArrayBindingPattern (unbox v) then Some (v :> obj :?> ArrayBindingPattern) else None
         let ofArrayBindingPattern v: BindingPattern = v |> U2.Case2
-        let isArrayBindingPattern (v: BindingPattern) = match v with U2.Case2 _ -> true | _ -> false
-        let asArrayBindingPattern (v: BindingPattern) = match v with U2.Case2 o -> Some o | _ -> None
+        let isArrayBindingPattern (v: BindingPattern) = match v with IsArrayBindingPattern _ -> true | _ -> false
+        let asArrayBindingPattern (v: BindingPattern) = match v with IsArrayBindingPattern o -> Some o | _ -> None
+        let (|IsBindingPattern|_|) v = match unbox v with IsObjectBindingPattern _ | IsArrayBindingPattern _ -> Some (v :> obj :?> BindingPattern) | _ -> None
 
     type ArrayBindingElement =
         U2<BindingElement, OmittedExpression>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module ArrayBindingElement =
+        let (|IsBindingElement|_|) (v: ArrayBindingElement) = if ts.isBindingElement (unbox v) then Some (v :> obj :?> BindingElement) else None
         let ofBindingElement v: ArrayBindingElement = v |> U2.Case1
-        let isBindingElement (v: ArrayBindingElement) = match v with U2.Case1 _ -> true | _ -> false
-        let asBindingElement (v: ArrayBindingElement) = match v with U2.Case1 o -> Some o | _ -> None
+        let isBindingElement (v: ArrayBindingElement) = match v with IsBindingElement _ -> true | _ -> false
+        let asBindingElement (v: ArrayBindingElement) = match v with IsBindingElement o -> Some o | _ -> None
+        let (|IsOmittedExpression|_|) (v: ArrayBindingElement) = if ts.isOmittedExpression (unbox v) then Some (v :> obj :?> OmittedExpression) else None
         let ofOmittedExpression v: ArrayBindingElement = v |> U2.Case2
-        let isOmittedExpression (v: ArrayBindingElement) = match v with U2.Case2 _ -> true | _ -> false
-        let asOmittedExpression (v: ArrayBindingElement) = match v with U2.Case2 o -> Some o | _ -> None
+        let isOmittedExpression (v: ArrayBindingElement) = match v with IsOmittedExpression _ -> true | _ -> false
+        let asOmittedExpression (v: ArrayBindingElement) = match v with IsOmittedExpression o -> Some o | _ -> None
+        let (|IsArrayBindingElement|_|) v = match unbox v with IsBindingElement _ | IsOmittedExpression _ -> Some (v :> obj :?> ArrayBindingElement) | _ -> None
 
     /// Several node kinds share function-like features such as a signature,
     /// a name, and a body. These nodes should extend FunctionLikeDeclarationBase.
@@ -1609,54 +1661,70 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module FunctionLikeDeclaration =
+        let (|IsFunctionDeclaration|_|) (v: FunctionLikeDeclaration) = if ts.isFunctionDeclaration (unbox v) then Some (v :> obj :?> FunctionDeclaration) else None
         let ofFunctionDeclaration v: FunctionLikeDeclaration = v |> U7.Case1
-        let isFunctionDeclaration (v: FunctionLikeDeclaration) = match v with U7.Case1 _ -> true | _ -> false
-        let asFunctionDeclaration (v: FunctionLikeDeclaration) = match v with U7.Case1 o -> Some o | _ -> None
+        let isFunctionDeclaration (v: FunctionLikeDeclaration) = match v with IsFunctionDeclaration _ -> true | _ -> false
+        let asFunctionDeclaration (v: FunctionLikeDeclaration) = match v with IsFunctionDeclaration o -> Some o | _ -> None
+        let (|IsMethodDeclaration|_|) (v: FunctionLikeDeclaration) = if ts.isMethodDeclaration (unbox v) then Some (v :> obj :?> MethodDeclaration) else None
         let ofMethodDeclaration v: FunctionLikeDeclaration = v |> U7.Case2
-        let isMethodDeclaration (v: FunctionLikeDeclaration) = match v with U7.Case2 _ -> true | _ -> false
-        let asMethodDeclaration (v: FunctionLikeDeclaration) = match v with U7.Case2 o -> Some o | _ -> None
+        let isMethodDeclaration (v: FunctionLikeDeclaration) = match v with IsMethodDeclaration _ -> true | _ -> false
+        let asMethodDeclaration (v: FunctionLikeDeclaration) = match v with IsMethodDeclaration o -> Some o | _ -> None
+        let (|IsConstructorDeclaration|_|) (v: FunctionLikeDeclaration) = if ts.isConstructorDeclaration (unbox v) then Some (v :> obj :?> ConstructorDeclaration) else None
         let ofConstructorDeclaration v: FunctionLikeDeclaration = v |> U7.Case3
-        let isConstructorDeclaration (v: FunctionLikeDeclaration) = match v with U7.Case3 _ -> true | _ -> false
-        let asConstructorDeclaration (v: FunctionLikeDeclaration) = match v with U7.Case3 o -> Some o | _ -> None
+        let isConstructorDeclaration (v: FunctionLikeDeclaration) = match v with IsConstructorDeclaration _ -> true | _ -> false
+        let asConstructorDeclaration (v: FunctionLikeDeclaration) = match v with IsConstructorDeclaration o -> Some o | _ -> None
+        let (|IsGetAccessorDeclaration|_|) (v: FunctionLikeDeclaration) = if ts.isGetAccessorDeclaration (unbox v) then Some (v :> obj :?> GetAccessorDeclaration) else None
         let ofGetAccessorDeclaration v: FunctionLikeDeclaration = v |> U7.Case4
-        let isGetAccessorDeclaration (v: FunctionLikeDeclaration) = match v with U7.Case4 _ -> true | _ -> false
-        let asGetAccessorDeclaration (v: FunctionLikeDeclaration) = match v with U7.Case4 o -> Some o | _ -> None
+        let isGetAccessorDeclaration (v: FunctionLikeDeclaration) = match v with IsGetAccessorDeclaration _ -> true | _ -> false
+        let asGetAccessorDeclaration (v: FunctionLikeDeclaration) = match v with IsGetAccessorDeclaration o -> Some o | _ -> None
+        let (|IsSetAccessorDeclaration|_|) (v: FunctionLikeDeclaration) = if ts.isSetAccessorDeclaration (unbox v) then Some (v :> obj :?> SetAccessorDeclaration) else None
         let ofSetAccessorDeclaration v: FunctionLikeDeclaration = v |> U7.Case5
-        let isSetAccessorDeclaration (v: FunctionLikeDeclaration) = match v with U7.Case5 _ -> true | _ -> false
-        let asSetAccessorDeclaration (v: FunctionLikeDeclaration) = match v with U7.Case5 o -> Some o | _ -> None
+        let isSetAccessorDeclaration (v: FunctionLikeDeclaration) = match v with IsSetAccessorDeclaration _ -> true | _ -> false
+        let asSetAccessorDeclaration (v: FunctionLikeDeclaration) = match v with IsSetAccessorDeclaration o -> Some o | _ -> None
+        let (|IsFunctionExpression|_|) (v: FunctionLikeDeclaration) = if ts.isFunctionExpression (unbox v) then Some (v :> obj :?> FunctionExpression) else None
         let ofFunctionExpression v: FunctionLikeDeclaration = v |> U7.Case6
-        let isFunctionExpression (v: FunctionLikeDeclaration) = match v with U7.Case6 _ -> true | _ -> false
-        let asFunctionExpression (v: FunctionLikeDeclaration) = match v with U7.Case6 o -> Some o | _ -> None
+        let isFunctionExpression (v: FunctionLikeDeclaration) = match v with IsFunctionExpression _ -> true | _ -> false
+        let asFunctionExpression (v: FunctionLikeDeclaration) = match v with IsFunctionExpression o -> Some o | _ -> None
+        let (|IsArrowFunction|_|) (v: FunctionLikeDeclaration) = if ts.isArrowFunction (unbox v) then Some (v :> obj :?> ArrowFunction) else None
         let ofArrowFunction v: FunctionLikeDeclaration = v |> U7.Case7
-        let isArrowFunction (v: FunctionLikeDeclaration) = match v with U7.Case7 _ -> true | _ -> false
-        let asArrowFunction (v: FunctionLikeDeclaration) = match v with U7.Case7 o -> Some o | _ -> None
+        let isArrowFunction (v: FunctionLikeDeclaration) = match v with IsArrowFunction _ -> true | _ -> false
+        let asArrowFunction (v: FunctionLikeDeclaration) = match v with IsArrowFunction o -> Some o | _ -> None
+        let (|IsFunctionLikeDeclaration|_|) v = match unbox v with IsFunctionDeclaration _ | IsMethodDeclaration _ | IsConstructorDeclaration _ | IsGetAccessorDeclaration _ | IsSetAccessorDeclaration _ | IsFunctionExpression _ | IsArrowFunction _ -> Some (v :> obj :?> FunctionLikeDeclaration) | _ -> None
 
     type FunctionLike =
         U7<FunctionLikeDeclaration, FunctionTypeNode, ConstructorTypeNode, IndexSignatureDeclaration, MethodSignature, ConstructSignatureDeclaration, CallSignatureDeclaration>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module FunctionLike =
+        let (|IsFunctionLikeDeclaration|_|) (v: FunctionLike) = match unbox v with FunctionLikeDeclaration.IsFunctionLikeDeclaration v -> Some (v :> obj :?> FunctionLikeDeclaration) | _ -> None
         let ofFunctionLikeDeclaration v: FunctionLike = v |> U7.Case1
-        let isFunctionLikeDeclaration (v: FunctionLike) = match v with U7.Case1 _ -> true | _ -> false
-        let asFunctionLikeDeclaration (v: FunctionLike) = match v with U7.Case1 o -> Some o | _ -> None
+        let isFunctionLikeDeclaration (v: FunctionLike) = match v with IsFunctionLikeDeclaration _ -> true | _ -> false
+        let asFunctionLikeDeclaration (v: FunctionLike) = match v with IsFunctionLikeDeclaration o -> Some o | _ -> None
+        let (|IsFunctionTypeNode|_|) (v: FunctionLike) = if ts.isFunctionTypeNode (unbox v) then Some (v :> obj :?> FunctionTypeNode) else None
         let ofFunctionTypeNode v: FunctionLike = v |> U7.Case2
-        let isFunctionTypeNode (v: FunctionLike) = match v with U7.Case2 _ -> true | _ -> false
-        let asFunctionTypeNode (v: FunctionLike) = match v with U7.Case2 o -> Some o | _ -> None
+        let isFunctionTypeNode (v: FunctionLike) = match v with IsFunctionTypeNode _ -> true | _ -> false
+        let asFunctionTypeNode (v: FunctionLike) = match v with IsFunctionTypeNode o -> Some o | _ -> None
+        let (|IsConstructorTypeNode|_|) (v: FunctionLike) = if ts.isConstructorTypeNode (unbox v) then Some (v :> obj :?> ConstructorTypeNode) else None
         let ofConstructorTypeNode v: FunctionLike = v |> U7.Case3
-        let isConstructorTypeNode (v: FunctionLike) = match v with U7.Case3 _ -> true | _ -> false
-        let asConstructorTypeNode (v: FunctionLike) = match v with U7.Case3 o -> Some o | _ -> None
+        let isConstructorTypeNode (v: FunctionLike) = match v with IsConstructorTypeNode _ -> true | _ -> false
+        let asConstructorTypeNode (v: FunctionLike) = match v with IsConstructorTypeNode o -> Some o | _ -> None
+        let (|IsIndexSignatureDeclaration|_|) (v: FunctionLike) = if ts.isIndexSignatureDeclaration (unbox v) then Some (v :> obj :?> IndexSignatureDeclaration) else None
         let ofIndexSignatureDeclaration v: FunctionLike = v |> U7.Case4
-        let isIndexSignatureDeclaration (v: FunctionLike) = match v with U7.Case4 _ -> true | _ -> false
-        let asIndexSignatureDeclaration (v: FunctionLike) = match v with U7.Case4 o -> Some o | _ -> None
+        let isIndexSignatureDeclaration (v: FunctionLike) = match v with IsIndexSignatureDeclaration _ -> true | _ -> false
+        let asIndexSignatureDeclaration (v: FunctionLike) = match v with IsIndexSignatureDeclaration o -> Some o | _ -> None
+        let (|IsMethodSignature|_|) (v: FunctionLike) = if ts.isMethodSignature (unbox v) then Some (v :> obj :?> MethodSignature) else None
         let ofMethodSignature v: FunctionLike = v |> U7.Case5
-        let isMethodSignature (v: FunctionLike) = match v with U7.Case5 _ -> true | _ -> false
-        let asMethodSignature (v: FunctionLike) = match v with U7.Case5 o -> Some o | _ -> None
+        let isMethodSignature (v: FunctionLike) = match v with IsMethodSignature _ -> true | _ -> false
+        let asMethodSignature (v: FunctionLike) = match v with IsMethodSignature o -> Some o | _ -> None
+        let (|IsConstructSignatureDeclaration|_|) (v: FunctionLike) = if ts.isConstructSignatureDeclaration (unbox v) then Some (v :> obj :?> ConstructSignatureDeclaration) else None
         let ofConstructSignatureDeclaration v: FunctionLike = v |> U7.Case6
-        let isConstructSignatureDeclaration (v: FunctionLike) = match v with U7.Case6 _ -> true | _ -> false
-        let asConstructSignatureDeclaration (v: FunctionLike) = match v with U7.Case6 o -> Some o | _ -> None
+        let isConstructSignatureDeclaration (v: FunctionLike) = match v with IsConstructSignatureDeclaration _ -> true | _ -> false
+        let asConstructSignatureDeclaration (v: FunctionLike) = match v with IsConstructSignatureDeclaration o -> Some o | _ -> None
+        let (|IsCallSignatureDeclaration|_|) (v: FunctionLike) = if ts.isCallSignatureDeclaration (unbox v) then Some (v :> obj :?> CallSignatureDeclaration) else None
         let ofCallSignatureDeclaration v: FunctionLike = v |> U7.Case7
-        let isCallSignatureDeclaration (v: FunctionLike) = match v with U7.Case7 _ -> true | _ -> false
-        let asCallSignatureDeclaration (v: FunctionLike) = match v with U7.Case7 o -> Some o | _ -> None
+        let isCallSignatureDeclaration (v: FunctionLike) = match v with IsCallSignatureDeclaration _ -> true | _ -> false
+        let asCallSignatureDeclaration (v: FunctionLike) = match v with IsCallSignatureDeclaration o -> Some o | _ -> None
+        let (|IsFunctionLike|_|) v = match unbox v with IsFunctionLikeDeclaration _ | IsFunctionTypeNode _ | IsConstructorTypeNode _ | IsIndexSignatureDeclaration _ | IsMethodSignature _ | IsConstructSignatureDeclaration _ | IsCallSignatureDeclaration _ -> Some (v :> obj :?> FunctionLike) | _ -> None
 
     type [<AllowNullLiteral>] FunctionDeclaration =
         inherit FunctionLikeDeclarationBase
@@ -1719,12 +1787,15 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module AccessorDeclaration =
+        let (|IsGetAccessorDeclaration|_|) (v: AccessorDeclaration) = if ts.isGetAccessorDeclaration (unbox v) then Some (v :> obj :?> GetAccessorDeclaration) else None
         let ofGetAccessorDeclaration v: AccessorDeclaration = v |> U2.Case1
-        let isGetAccessorDeclaration (v: AccessorDeclaration) = match v with U2.Case1 _ -> true | _ -> false
-        let asGetAccessorDeclaration (v: AccessorDeclaration) = match v with U2.Case1 o -> Some o | _ -> None
+        let isGetAccessorDeclaration (v: AccessorDeclaration) = match v with IsGetAccessorDeclaration _ -> true | _ -> false
+        let asGetAccessorDeclaration (v: AccessorDeclaration) = match v with IsGetAccessorDeclaration o -> Some o | _ -> None
+        let (|IsSetAccessorDeclaration|_|) (v: AccessorDeclaration) = if ts.isSetAccessorDeclaration (unbox v) then Some (v :> obj :?> SetAccessorDeclaration) else None
         let ofSetAccessorDeclaration v: AccessorDeclaration = v |> U2.Case2
-        let isSetAccessorDeclaration (v: AccessorDeclaration) = match v with U2.Case2 _ -> true | _ -> false
-        let asSetAccessorDeclaration (v: AccessorDeclaration) = match v with U2.Case2 o -> Some o | _ -> None
+        let isSetAccessorDeclaration (v: AccessorDeclaration) = match v with IsSetAccessorDeclaration _ -> true | _ -> false
+        let asSetAccessorDeclaration (v: AccessorDeclaration) = match v with IsSetAccessorDeclaration o -> Some o | _ -> None
+        let (|IsAccessorDeclaration|_|) v = match unbox v with IsGetAccessorDeclaration _ | IsSetAccessorDeclaration _ -> Some (v :> obj :?> AccessorDeclaration) | _ -> None
 
     type [<AllowNullLiteral>] IndexSignatureDeclaration =
         inherit SignatureDeclarationBase
@@ -1750,12 +1821,15 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module FunctionOrConstructorTypeNode =
+        let (|IsFunctionTypeNode|_|) (v: FunctionOrConstructorTypeNode) = if ts.isFunctionTypeNode (unbox v) then Some (v :> obj :?> FunctionTypeNode) else None
         let ofFunctionTypeNode v: FunctionOrConstructorTypeNode = v |> U2.Case1
-        let isFunctionTypeNode (v: FunctionOrConstructorTypeNode) = match v with U2.Case1 _ -> true | _ -> false
-        let asFunctionTypeNode (v: FunctionOrConstructorTypeNode) = match v with U2.Case1 o -> Some o | _ -> None
+        let isFunctionTypeNode (v: FunctionOrConstructorTypeNode) = match v with IsFunctionTypeNode _ -> true | _ -> false
+        let asFunctionTypeNode (v: FunctionOrConstructorTypeNode) = match v with IsFunctionTypeNode o -> Some o | _ -> None
+        let (|IsConstructorTypeNode|_|) (v: FunctionOrConstructorTypeNode) = if ts.isConstructorTypeNode (unbox v) then Some (v :> obj :?> ConstructorTypeNode) else None
         let ofConstructorTypeNode v: FunctionOrConstructorTypeNode = v |> U2.Case2
-        let isConstructorTypeNode (v: FunctionOrConstructorTypeNode) = match v with U2.Case2 _ -> true | _ -> false
-        let asConstructorTypeNode (v: FunctionOrConstructorTypeNode) = match v with U2.Case2 o -> Some o | _ -> None
+        let isConstructorTypeNode (v: FunctionOrConstructorTypeNode) = match v with IsConstructorTypeNode _ -> true | _ -> false
+        let asConstructorTypeNode (v: FunctionOrConstructorTypeNode) = match v with IsConstructorTypeNode o -> Some o | _ -> None
+        let (|IsFunctionOrConstructorTypeNode|_|) v = match unbox v with IsFunctionTypeNode _ | IsConstructorTypeNode _ -> Some (v :> obj :?> FunctionOrConstructorTypeNode) | _ -> None
 
     type [<AllowNullLiteral>] FunctionTypeNode =
         inherit TypeNode
@@ -1772,12 +1846,15 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module TypeReferenceType =
+        let (|IsTypeReferenceNode|_|) (v: TypeReferenceType) = if ts.isTypeReferenceNode (unbox v) then Some (v :> obj :?> TypeReferenceNode) else None
         let ofTypeReferenceNode v: TypeReferenceType = v |> U2.Case1
-        let isTypeReferenceNode (v: TypeReferenceType) = match v with U2.Case1 _ -> true | _ -> false
-        let asTypeReferenceNode (v: TypeReferenceType) = match v with U2.Case1 o -> Some o | _ -> None
+        let isTypeReferenceNode (v: TypeReferenceType) = match v with IsTypeReferenceNode _ -> true | _ -> false
+        let asTypeReferenceNode (v: TypeReferenceType) = match v with IsTypeReferenceNode o -> Some o | _ -> None
+        let (|IsExpressionWithTypeArguments|_|) (v: TypeReferenceType) = if ts.isExpressionWithTypeArguments (unbox v) then Some (v :> obj :?> ExpressionWithTypeArguments) else None
         let ofExpressionWithTypeArguments v: TypeReferenceType = v |> U2.Case2
-        let isExpressionWithTypeArguments (v: TypeReferenceType) = match v with U2.Case2 _ -> true | _ -> false
-        let asExpressionWithTypeArguments (v: TypeReferenceType) = match v with U2.Case2 o -> Some o | _ -> None
+        let isExpressionWithTypeArguments (v: TypeReferenceType) = match v with IsExpressionWithTypeArguments _ -> true | _ -> false
+        let asExpressionWithTypeArguments (v: TypeReferenceType) = match v with IsExpressionWithTypeArguments o -> Some o | _ -> None
+        let (|IsTypeReferenceType|_|) v = match unbox v with IsTypeReferenceNode _ | IsExpressionWithTypeArguments _ -> Some (v :> obj :?> TypeReferenceType) | _ -> None
 
     type [<AllowNullLiteral>] TypeReferenceNode =
         inherit TypeNode
@@ -1818,12 +1895,15 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module UnionOrIntersectionTypeNode =
+        let (|IsUnionTypeNode|_|) (v: UnionOrIntersectionTypeNode) = if ts.isUnionTypeNode (unbox v) then Some (v :> obj :?> UnionTypeNode) else None
         let ofUnionTypeNode v: UnionOrIntersectionTypeNode = v |> U2.Case1
-        let isUnionTypeNode (v: UnionOrIntersectionTypeNode) = match v with U2.Case1 _ -> true | _ -> false
-        let asUnionTypeNode (v: UnionOrIntersectionTypeNode) = match v with U2.Case1 o -> Some o | _ -> None
+        let isUnionTypeNode (v: UnionOrIntersectionTypeNode) = match v with IsUnionTypeNode _ -> true | _ -> false
+        let asUnionTypeNode (v: UnionOrIntersectionTypeNode) = match v with IsUnionTypeNode o -> Some o | _ -> None
+        let (|IsIntersectionTypeNode|_|) (v: UnionOrIntersectionTypeNode) = if ts.isIntersectionTypeNode (unbox v) then Some (v :> obj :?> IntersectionTypeNode) else None
         let ofIntersectionTypeNode v: UnionOrIntersectionTypeNode = v |> U2.Case2
-        let isIntersectionTypeNode (v: UnionOrIntersectionTypeNode) = match v with U2.Case2 _ -> true | _ -> false
-        let asIntersectionTypeNode (v: UnionOrIntersectionTypeNode) = match v with U2.Case2 o -> Some o | _ -> None
+        let isIntersectionTypeNode (v: UnionOrIntersectionTypeNode) = match v with IsIntersectionTypeNode _ -> true | _ -> false
+        let asIntersectionTypeNode (v: UnionOrIntersectionTypeNode) = match v with IsIntersectionTypeNode o -> Some o | _ -> None
+        let (|IsUnionOrIntersectionTypeNode|_|) v = match unbox v with IsUnionTypeNode _ | IsIntersectionTypeNode _ -> Some (v :> obj :?> UnionOrIntersectionTypeNode) | _ -> None
 
     type [<AllowNullLiteral>] UnionTypeNode =
         inherit TypeNode
@@ -1976,149 +2056,215 @@ module Ts =
     type ExponentiationOperator =
         SyntaxKind
 
+    [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+    module ExponentiationOperator =
+        let (|IsExponentiationOperator|_|) (v: obj) = match Int32.TryParse(string v) with (true, _) -> Some (v :?> ExponentiationOperator) | _ -> None
+
     type MultiplicativeOperator =
         SyntaxKind
+
+    [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+    module MultiplicativeOperator =
+        let (|IsMultiplicativeOperator|_|) (v: obj) = match Int32.TryParse(string v) with (true, _) -> Some (v :?> MultiplicativeOperator) | _ -> None
 
     type MultiplicativeOperatorOrHigher =
         U2<ExponentiationOperator, MultiplicativeOperator>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module MultiplicativeOperatorOrHigher =
+        let (|IsExponentiationOperator|_|) (v: MultiplicativeOperatorOrHigher) = match unbox v with ExponentiationOperator.IsExponentiationOperator v -> Some (v :> obj :?> ExponentiationOperator) | _ -> None
         let ofExponentiationOperator v: MultiplicativeOperatorOrHigher = v |> U2.Case1
-        let isExponentiationOperator (v: MultiplicativeOperatorOrHigher) = match v with U2.Case1 _ -> true | _ -> false
-        let asExponentiationOperator (v: MultiplicativeOperatorOrHigher) = match v with U2.Case1 o -> Some o | _ -> None
+        let isExponentiationOperator (v: MultiplicativeOperatorOrHigher) = match v with IsExponentiationOperator _ -> true | _ -> false
+        let asExponentiationOperator (v: MultiplicativeOperatorOrHigher) = match v with IsExponentiationOperator o -> Some o | _ -> None
+        let (|IsMultiplicativeOperator|_|) (v: MultiplicativeOperatorOrHigher) = match unbox v with MultiplicativeOperator.IsMultiplicativeOperator v -> Some (v :> obj :?> MultiplicativeOperator) | _ -> None
         let ofMultiplicativeOperator v: MultiplicativeOperatorOrHigher = v |> U2.Case2
-        let isMultiplicativeOperator (v: MultiplicativeOperatorOrHigher) = match v with U2.Case2 _ -> true | _ -> false
-        let asMultiplicativeOperator (v: MultiplicativeOperatorOrHigher) = match v with U2.Case2 o -> Some o | _ -> None
+        let isMultiplicativeOperator (v: MultiplicativeOperatorOrHigher) = match v with IsMultiplicativeOperator _ -> true | _ -> false
+        let asMultiplicativeOperator (v: MultiplicativeOperatorOrHigher) = match v with IsMultiplicativeOperator o -> Some o | _ -> None
+        let (|IsMultiplicativeOperatorOrHigher|_|) v = match unbox v with IsExponentiationOperator _ | IsMultiplicativeOperator _ -> Some (v :> obj :?> MultiplicativeOperatorOrHigher) | _ -> None
 
     type AdditiveOperator =
         SyntaxKind
+
+    [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+    module AdditiveOperator =
+        let (|IsAdditiveOperator|_|) (v: obj) = match Int32.TryParse(string v) with (true, _) -> Some (v :?> AdditiveOperator) | _ -> None
 
     type AdditiveOperatorOrHigher =
         U2<MultiplicativeOperatorOrHigher, AdditiveOperator>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module AdditiveOperatorOrHigher =
+        let (|IsMultiplicativeOperatorOrHigher|_|) (v: AdditiveOperatorOrHigher) = match unbox v with MultiplicativeOperatorOrHigher.IsExponentiationOperator v -> Some (v :> obj :?> MultiplicativeOperatorOrHigher) | _ -> None
         let ofMultiplicativeOperatorOrHigher v: AdditiveOperatorOrHigher = v |> U2.Case1
-        let isMultiplicativeOperatorOrHigher (v: AdditiveOperatorOrHigher) = match v with U2.Case1 _ -> true | _ -> false
-        let asMultiplicativeOperatorOrHigher (v: AdditiveOperatorOrHigher) = match v with U2.Case1 o -> Some o | _ -> None
+        let isMultiplicativeOperatorOrHigher (v: AdditiveOperatorOrHigher) = match v with IsMultiplicativeOperatorOrHigher _ -> true | _ -> false
+        let asMultiplicativeOperatorOrHigher (v: AdditiveOperatorOrHigher) = match v with IsMultiplicativeOperatorOrHigher o -> Some o | _ -> None
+        let (|IsAdditiveOperator|_|) (v: AdditiveOperatorOrHigher) = match unbox v with AdditiveOperator.IsAdditiveOperator v -> Some (v :> obj :?> AdditiveOperator) | _ -> None
         let ofAdditiveOperator v: AdditiveOperatorOrHigher = v |> U2.Case2
-        let isAdditiveOperator (v: AdditiveOperatorOrHigher) = match v with U2.Case2 _ -> true | _ -> false
-        let asAdditiveOperator (v: AdditiveOperatorOrHigher) = match v with U2.Case2 o -> Some o | _ -> None
+        let isAdditiveOperator (v: AdditiveOperatorOrHigher) = match v with IsAdditiveOperator _ -> true | _ -> false
+        let asAdditiveOperator (v: AdditiveOperatorOrHigher) = match v with IsAdditiveOperator o -> Some o | _ -> None
+        let (|IsAdditiveOperatorOrHigher|_|) v = match unbox v with IsMultiplicativeOperatorOrHigher _ | IsAdditiveOperator _ -> Some (v :> obj :?> AdditiveOperatorOrHigher) | _ -> None
 
     type ShiftOperator =
         SyntaxKind
+
+    [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+    module ShiftOperator =
+        let (|IsShiftOperator|_|) (v: obj) = match Int32.TryParse(string v) with (true, _) -> Some (v :?> ShiftOperator) | _ -> None
 
     type ShiftOperatorOrHigher =
         U2<AdditiveOperatorOrHigher, ShiftOperator>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module ShiftOperatorOrHigher =
+        let (|IsAdditiveOperatorOrHigher|_|) (v: ShiftOperatorOrHigher) = match unbox v with AdditiveOperatorOrHigher.IsAdditiveOperatorOrHigher v -> Some (v :> obj :?> AdditiveOperatorOrHigher) | _ -> None
         let ofAdditiveOperatorOrHigher v: ShiftOperatorOrHigher = v |> U2.Case1
-        let isAdditiveOperatorOrHigher (v: ShiftOperatorOrHigher) = match v with U2.Case1 _ -> true | _ -> false
-        let asAdditiveOperatorOrHigher (v: ShiftOperatorOrHigher) = match v with U2.Case1 o -> Some o | _ -> None
+        let isAdditiveOperatorOrHigher (v: ShiftOperatorOrHigher) = match v with IsAdditiveOperatorOrHigher _ -> true | _ -> false
+        let asAdditiveOperatorOrHigher (v: ShiftOperatorOrHigher) = match v with IsAdditiveOperatorOrHigher o -> Some o | _ -> None
+        let (|IsShiftOperator|_|) (v: ShiftOperatorOrHigher) = match unbox v with ShiftOperator.IsShiftOperator v -> Some (v :> obj :?> ShiftOperator) | _ -> None
         let ofShiftOperator v: ShiftOperatorOrHigher = v |> U2.Case2
-        let isShiftOperator (v: ShiftOperatorOrHigher) = match v with U2.Case2 _ -> true | _ -> false
-        let asShiftOperator (v: ShiftOperatorOrHigher) = match v with U2.Case2 o -> Some o | _ -> None
+        let isShiftOperator (v: ShiftOperatorOrHigher) = match v with IsShiftOperator _ -> true | _ -> false
+        let asShiftOperator (v: ShiftOperatorOrHigher) = match v with IsShiftOperator o -> Some o | _ -> None
+        let (|IsShiftOperatorOrHigher|_|) v = match unbox v with IsAdditiveOperatorOrHigher _ | IsShiftOperator _ -> Some (v :> obj :?> ShiftOperatorOrHigher) | _ -> None
 
     type RelationalOperator =
         SyntaxKind
+
+    [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+    module RelationalOperator =
+        let (|IsRelationalOperator|_|) (v: obj) = match Int32.TryParse(string v) with (true, _) -> Some (v :?> RelationalOperator) | _ -> None
 
     type RelationalOperatorOrHigher =
         U2<ShiftOperatorOrHigher, RelationalOperator>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module RelationalOperatorOrHigher =
+        let (|IsShiftOperatorOrHigher|_|) (v: RelationalOperatorOrHigher) = match unbox v with ShiftOperatorOrHigher.IsShiftOperatorOrHigher v -> Some (v :> obj :?> ShiftOperatorOrHigher) | _ -> None
         let ofShiftOperatorOrHigher v: RelationalOperatorOrHigher = v |> U2.Case1
-        let isShiftOperatorOrHigher (v: RelationalOperatorOrHigher) = match v with U2.Case1 _ -> true | _ -> false
-        let asShiftOperatorOrHigher (v: RelationalOperatorOrHigher) = match v with U2.Case1 o -> Some o | _ -> None
+        let isShiftOperatorOrHigher (v: RelationalOperatorOrHigher) = match v with IsShiftOperatorOrHigher _ -> true | _ -> false
+        let asShiftOperatorOrHigher (v: RelationalOperatorOrHigher) = match v with IsShiftOperatorOrHigher o -> Some o | _ -> None
+        let (|IsRelationalOperator|_|) (v: RelationalOperatorOrHigher) = match unbox v with RelationalOperator.IsRelationalOperator v -> Some (v :> obj :?> RelationalOperator) | _ -> None
         let ofRelationalOperator v: RelationalOperatorOrHigher = v |> U2.Case2
-        let isRelationalOperator (v: RelationalOperatorOrHigher) = match v with U2.Case2 _ -> true | _ -> false
-        let asRelationalOperator (v: RelationalOperatorOrHigher) = match v with U2.Case2 o -> Some o | _ -> None
+        let isRelationalOperator (v: RelationalOperatorOrHigher) = match v with IsRelationalOperator _ -> true | _ -> false
+        let asRelationalOperator (v: RelationalOperatorOrHigher) = match v with IsRelationalOperator o -> Some o | _ -> None
+        let (|IsRelationalOperatorOrHigher|_|) v = match unbox v with IsShiftOperatorOrHigher _ | IsRelationalOperator _ -> Some (v :> obj :?> RelationalOperatorOrHigher) | _ -> None
 
     type EqualityOperator =
         SyntaxKind
+
+    [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+    module EqualityOperator =
+        let (|IsEqualityOperator|_|) (v: obj) = match Int32.TryParse(string v) with (true, _) -> Some (v :?> EqualityOperator) | _ -> None
 
     type EqualityOperatorOrHigher =
         U2<RelationalOperatorOrHigher, EqualityOperator>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module EqualityOperatorOrHigher =
+        let (|IsRelationalOperatorOrHigher|_|) (v: EqualityOperatorOrHigher) = match unbox v with RelationalOperatorOrHigher.IsRelationalOperatorOrHigher v -> Some (v :> obj :?> RelationalOperatorOrHigher) | _ -> None
         let ofRelationalOperatorOrHigher v: EqualityOperatorOrHigher = v |> U2.Case1
-        let isRelationalOperatorOrHigher (v: EqualityOperatorOrHigher) = match v with U2.Case1 _ -> true | _ -> false
-        let asRelationalOperatorOrHigher (v: EqualityOperatorOrHigher) = match v with U2.Case1 o -> Some o | _ -> None
+        let isRelationalOperatorOrHigher (v: EqualityOperatorOrHigher) = match v with IsRelationalOperatorOrHigher _ -> true | _ -> false
+        let asRelationalOperatorOrHigher (v: EqualityOperatorOrHigher) = match v with IsRelationalOperatorOrHigher o -> Some o | _ -> None
+        let (|IsEqualityOperator|_|) (v: EqualityOperatorOrHigher) = match unbox v with EqualityOperator.IsEqualityOperator v -> Some (v :> obj :?> EqualityOperator) | _ -> None
         let ofEqualityOperator v: EqualityOperatorOrHigher = v |> U2.Case2
-        let isEqualityOperator (v: EqualityOperatorOrHigher) = match v with U2.Case2 _ -> true | _ -> false
-        let asEqualityOperator (v: EqualityOperatorOrHigher) = match v with U2.Case2 o -> Some o | _ -> None
+        let isEqualityOperator (v: EqualityOperatorOrHigher) = match v with IsEqualityOperator _ -> true | _ -> false
+        let asEqualityOperator (v: EqualityOperatorOrHigher) = match v with IsEqualityOperator o -> Some o | _ -> None
+        let (|IsEqualityOperatorOrHigher|_|) v = match unbox v with IsRelationalOperatorOrHigher _ | IsEqualityOperator _ -> Some (v :> obj :?> EqualityOperatorOrHigher) | _ -> None
 
     type BitwiseOperator =
         SyntaxKind
+
+    [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+    module BitwiseOperator =
+        let (|IsBitwiseOperator|_|) (v: obj) = match Int32.TryParse(string v) with (true, _) -> Some (v :?> BitwiseOperator) | _ -> None
 
     type BitwiseOperatorOrHigher =
         U2<EqualityOperatorOrHigher, BitwiseOperator>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module BitwiseOperatorOrHigher =
+        let (|IsEqualityOperatorOrHigher|_|) (v: BitwiseOperatorOrHigher) = match unbox v with EqualityOperatorOrHigher.IsEqualityOperatorOrHigher v -> Some (v :> obj :?> EqualityOperatorOrHigher) | _ -> None
         let ofEqualityOperatorOrHigher v: BitwiseOperatorOrHigher = v |> U2.Case1
-        let isEqualityOperatorOrHigher (v: BitwiseOperatorOrHigher) = match v with U2.Case1 _ -> true | _ -> false
-        let asEqualityOperatorOrHigher (v: BitwiseOperatorOrHigher) = match v with U2.Case1 o -> Some o | _ -> None
+        let isEqualityOperatorOrHigher (v: BitwiseOperatorOrHigher) = match v with IsEqualityOperatorOrHigher _ -> true | _ -> false
+        let asEqualityOperatorOrHigher (v: BitwiseOperatorOrHigher) = match v with IsEqualityOperatorOrHigher o -> Some o | _ -> None
+        let (|IsBitwiseOperator|_|) (v: BitwiseOperatorOrHigher) = match unbox v with BitwiseOperator.IsBitwiseOperator v -> Some (v :> obj :?> BitwiseOperator) | _ -> None
         let ofBitwiseOperator v: BitwiseOperatorOrHigher = v |> U2.Case2
-        let isBitwiseOperator (v: BitwiseOperatorOrHigher) = match v with U2.Case2 _ -> true | _ -> false
-        let asBitwiseOperator (v: BitwiseOperatorOrHigher) = match v with U2.Case2 o -> Some o | _ -> None
+        let isBitwiseOperator (v: BitwiseOperatorOrHigher) = match v with IsBitwiseOperator _ -> true | _ -> false
+        let asBitwiseOperator (v: BitwiseOperatorOrHigher) = match v with IsBitwiseOperator o -> Some o | _ -> None
+        let (|IsBitwiseOperatorOrHigher|_|) v = match unbox v with IsEqualityOperatorOrHigher _ | IsBitwiseOperator _ -> Some (v :> obj :?> BitwiseOperatorOrHigher) | _ -> None
 
     type LogicalOperator =
         SyntaxKind
+
+    [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+    module LogicalOperator =
+        let (|IsLogicalOperator|_|) (v: obj) = match Int32.TryParse(string v) with (true, _) -> Some (v :?> LogicalOperator) | _ -> None
 
     type LogicalOperatorOrHigher =
         U2<BitwiseOperatorOrHigher, LogicalOperator>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module LogicalOperatorOrHigher =
+        let (|IsBitwiseOperatorOrHigher|_|) (v: LogicalOperatorOrHigher) = match unbox v with BitwiseOperatorOrHigher.IsBitwiseOperatorOrHigher v -> Some (v :> obj :?> BitwiseOperatorOrHigher) | _ -> None
         let ofBitwiseOperatorOrHigher v: LogicalOperatorOrHigher = v |> U2.Case1
-        let isBitwiseOperatorOrHigher (v: LogicalOperatorOrHigher) = match v with U2.Case1 _ -> true | _ -> false
-        let asBitwiseOperatorOrHigher (v: LogicalOperatorOrHigher) = match v with U2.Case1 o -> Some o | _ -> None
+        let isBitwiseOperatorOrHigher (v: LogicalOperatorOrHigher) = match v with IsBitwiseOperatorOrHigher _ -> true | _ -> false
+        let asBitwiseOperatorOrHigher (v: LogicalOperatorOrHigher) = match v with IsBitwiseOperatorOrHigher o -> Some o | _ -> None
+        let (|IsLogicalOperator|_|) (v: LogicalOperatorOrHigher) = match unbox v with LogicalOperator.IsLogicalOperator v -> Some (v :> obj :?> LogicalOperator) | _ -> None
         let ofLogicalOperator v: LogicalOperatorOrHigher = v |> U2.Case2
-        let isLogicalOperator (v: LogicalOperatorOrHigher) = match v with U2.Case2 _ -> true | _ -> false
-        let asLogicalOperator (v: LogicalOperatorOrHigher) = match v with U2.Case2 o -> Some o | _ -> None
+        let isLogicalOperator (v: LogicalOperatorOrHigher) = match v with IsLogicalOperator _ -> true | _ -> false
+        let asLogicalOperator (v: LogicalOperatorOrHigher) = match v with IsLogicalOperator o -> Some o | _ -> None
+        let (|IsLogicalOperatorOrHigher|_|) v = match unbox v with IsBitwiseOperatorOrHigher _ | IsLogicalOperator _ -> Some (v :> obj :?> LogicalOperatorOrHigher) | _ -> None
 
     type CompoundAssignmentOperator =
         SyntaxKind
+
+    [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+    module CompoundAssignmentOperator =
+        let (|IsCompoundAssignmentOperator|_|) (v: obj) = match Int32.TryParse(string v) with (true, _) -> Some (v :?> CompoundAssignmentOperator) | _ -> None
 
     type AssignmentOperator =
         U2<SyntaxKind, CompoundAssignmentOperator>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module AssignmentOperator =
+        let (|IsSyntaxKind|_|) (v: AssignmentOperator) = match unbox v with SyntaxKind.IsSyntaxKind v -> Some (v :> obj :?> SyntaxKind) | _ -> None
         let ofSyntaxKind v: AssignmentOperator = v |> U2.Case1
-        let isSyntaxKind (v: AssignmentOperator) = match v with U2.Case1 _ -> true | _ -> false
-        let asSyntaxKind (v: AssignmentOperator) = match v with U2.Case1 o -> Some o | _ -> None
+        let isSyntaxKind (v: AssignmentOperator) = match v with IsSyntaxKind _ -> true | _ -> false
+        let asSyntaxKind (v: AssignmentOperator) = match v with IsSyntaxKind o -> Some o | _ -> None
+        let (|IsCompoundAssignmentOperator|_|) (v: AssignmentOperator) = match unbox v with CompoundAssignmentOperator.IsCompoundAssignmentOperator v -> Some (v :> obj :?> CompoundAssignmentOperator) | _ -> None
         let ofCompoundAssignmentOperator v: AssignmentOperator = v |> U2.Case2
-        let isCompoundAssignmentOperator (v: AssignmentOperator) = match v with U2.Case2 _ -> true | _ -> false
-        let asCompoundAssignmentOperator (v: AssignmentOperator) = match v with U2.Case2 o -> Some o | _ -> None
+        let isCompoundAssignmentOperator (v: AssignmentOperator) = match v with IsCompoundAssignmentOperator _ -> true | _ -> false
+        let asCompoundAssignmentOperator (v: AssignmentOperator) = match v with IsCompoundAssignmentOperator o -> Some o | _ -> None
+        let (|IsAssignmentOperator|_|) v = match unbox v with IsSyntaxKind _ | IsCompoundAssignmentOperator _ -> Some (v :> obj :?> AssignmentOperator) | _ -> None
 
     type AssignmentOperatorOrHigher =
         U2<LogicalOperatorOrHigher, AssignmentOperator>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module AssignmentOperatorOrHigher =
+        let (|IsLogicalOperatorOrHigher|_|) (v: AssignmentOperatorOrHigher) = match unbox v with LogicalOperatorOrHigher.IsLogicalOperatorOrHigher v -> Some (v :> obj :?> LogicalOperatorOrHigher) | _ -> None
         let ofLogicalOperatorOrHigher v: AssignmentOperatorOrHigher = v |> U2.Case1
-        let isLogicalOperatorOrHigher (v: AssignmentOperatorOrHigher) = match v with U2.Case1 _ -> true | _ -> false
-        let asLogicalOperatorOrHigher (v: AssignmentOperatorOrHigher) = match v with U2.Case1 o -> Some o | _ -> None
+        let isLogicalOperatorOrHigher (v: AssignmentOperatorOrHigher) = match v with IsLogicalOperatorOrHigher _ -> true | _ -> false
+        let asLogicalOperatorOrHigher (v: AssignmentOperatorOrHigher) = match v with IsLogicalOperatorOrHigher o -> Some o | _ -> None
+        let (|IsAssignmentOperator|_|) (v: AssignmentOperatorOrHigher) = match unbox v with AssignmentOperator.IsAssignmentOperator v -> Some (v :> obj :?> AssignmentOperator) | _ -> None
         let ofAssignmentOperator v: AssignmentOperatorOrHigher = v |> U2.Case2
-        let isAssignmentOperator (v: AssignmentOperatorOrHigher) = match v with U2.Case2 _ -> true | _ -> false
-        let asAssignmentOperator (v: AssignmentOperatorOrHigher) = match v with U2.Case2 o -> Some o | _ -> None
+        let isAssignmentOperator (v: AssignmentOperatorOrHigher) = match v with IsAssignmentOperator _ -> true | _ -> false
+        let asAssignmentOperator (v: AssignmentOperatorOrHigher) = match v with IsAssignmentOperator o -> Some o | _ -> None
+        let (|IsAssignmentOperatorOrHigher|_|) v = match unbox v with IsLogicalOperatorOrHigher _ | IsAssignmentOperator _ -> Some (v :> obj :?> AssignmentOperatorOrHigher) | _ -> None
 
     type BinaryOperator =
         U2<AssignmentOperatorOrHigher, SyntaxKind>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module BinaryOperator =
+        let (|IsAssignmentOperatorOrHigher|_|) (v: BinaryOperator) = match unbox v with AssignmentOperatorOrHigher.IsAssignmentOperatorOrHigher v -> Some (v :> obj :?> AssignmentOperatorOrHigher) | _ -> None
         let ofAssignmentOperatorOrHigher v: BinaryOperator = v |> U2.Case1
-        let isAssignmentOperatorOrHigher (v: BinaryOperator) = match v with U2.Case1 _ -> true | _ -> false
-        let asAssignmentOperatorOrHigher (v: BinaryOperator) = match v with U2.Case1 o -> Some o | _ -> None
+        let isAssignmentOperatorOrHigher (v: BinaryOperator) = match v with IsAssignmentOperatorOrHigher _ -> true | _ -> false
+        let asAssignmentOperatorOrHigher (v: BinaryOperator) = match v with IsAssignmentOperatorOrHigher o -> Some o | _ -> None
+        let (|IsSyntaxKind|_|) (v: BinaryOperator) = match unbox v with SyntaxKind.IsSyntaxKind v -> Some (v :> obj :?> SyntaxKind) | _ -> None
         let ofSyntaxKind v: BinaryOperator = v |> U2.Case2
-        let isSyntaxKind (v: BinaryOperator) = match v with U2.Case2 _ -> true | _ -> false
-        let asSyntaxKind (v: BinaryOperator) = match v with U2.Case2 o -> Some o | _ -> None
+        let isSyntaxKind (v: BinaryOperator) = match v with IsSyntaxKind _ -> true | _ -> false
+        let asSyntaxKind (v: BinaryOperator) = match v with IsSyntaxKind o -> Some o | _ -> None
+        let (|IsBinaryOperator|_|) v = match unbox v with IsAssignmentOperatorOrHigher _ | IsSyntaxKind _ -> Some (v :> obj :?> BinaryOperator) | _ -> None
 
     type BinaryOperatorToken =
         Token<BinaryOperator>
@@ -2143,21 +2289,32 @@ module Ts =
         inherit AssignmentExpression<EqualsToken>
         abstract left: ObjectLiteralExpression with get, set
 
+    [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+    module ObjectDestructuringAssignment =
+        let (|IsObjectDestructuringAssignment|_|) (v: BinaryExpression) = if ts.isObjectLiteralExpression (unbox v.left) then Some (v :> obj :?> ObjectDestructuringAssignment) else None
+
     type [<AllowNullLiteral>] ArrayDestructuringAssignment =
         inherit AssignmentExpression<EqualsToken>
         abstract left: ArrayLiteralExpression with get, set
+
+    [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+    module ArrayDestructuringAssignment =
+        let (|IsArrayDestructuringAssignment|_|) (v: BinaryExpression) = if ts.isArrayLiteralExpression (unbox v.left) then Some (v :> obj :?> ArrayDestructuringAssignment) else None
 
     type DestructuringAssignment =
         U2<ObjectDestructuringAssignment, ArrayDestructuringAssignment>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module DestructuringAssignment =
+        let (|IsObjectDestructuringAssignment|_|) (v: DestructuringAssignment) = match unbox v with ObjectDestructuringAssignment.IsObjectDestructuringAssignment v -> Some (v :> obj :?> ObjectDestructuringAssignment) | _ -> None
         let ofObjectDestructuringAssignment v: DestructuringAssignment = v |> U2.Case1
-        let isObjectDestructuringAssignment (v: DestructuringAssignment) = match v with U2.Case1 _ -> true | _ -> false
-        let asObjectDestructuringAssignment (v: DestructuringAssignment) = match v with U2.Case1 o -> Some o | _ -> None
+        let isObjectDestructuringAssignment (v: DestructuringAssignment) = match v with IsObjectDestructuringAssignment _ -> true | _ -> false
+        let asObjectDestructuringAssignment (v: DestructuringAssignment) = match v with IsObjectDestructuringAssignment o -> Some o | _ -> None
+        let (|IsArrayDestructuringAssignment|_|) (v: DestructuringAssignment) = match unbox v with ArrayDestructuringAssignment.IsArrayDestructuringAssignment v -> Some (v :> obj :?> ArrayDestructuringAssignment) | _ -> None
         let ofArrayDestructuringAssignment v: DestructuringAssignment = v |> U2.Case2
-        let isArrayDestructuringAssignment (v: DestructuringAssignment) = match v with U2.Case2 _ -> true | _ -> false
-        let asArrayDestructuringAssignment (v: DestructuringAssignment) = match v with U2.Case2 o -> Some o | _ -> None
+        let isArrayDestructuringAssignment (v: DestructuringAssignment) = match v with IsArrayDestructuringAssignment _ -> true | _ -> false
+        let asArrayDestructuringAssignment (v: DestructuringAssignment) = match v with IsArrayDestructuringAssignment o -> Some o | _ -> None
+        let (|IsDestructuringAssignment|_|) v = match unbox v with IsObjectDestructuringAssignment _ | IsArrayDestructuringAssignment _ -> Some (v :> obj :?> DestructuringAssignment) | _ -> None
 
     type BindingOrAssignmentElement =
         obj
@@ -2167,75 +2324,96 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module BindingOrAssignmentElementRestIndicator =
+        let ts_isDotDotDotToken (v: Node) = (ts.isToken v && v.kind = SyntaxKind.DotDotDotToken)
+        let (|IsDotDotDotToken|_|) (v: BindingOrAssignmentElementRestIndicator) = if ts_isDotDotDotToken (unbox v) then Some (v :> obj :?> DotDotDotToken) else None
         let ofDotDotDotToken v: BindingOrAssignmentElementRestIndicator = v |> U3.Case1
-        let isDotDotDotToken (v: BindingOrAssignmentElementRestIndicator) = match v with U3.Case1 _ -> true | _ -> false
-        let asDotDotDotToken (v: BindingOrAssignmentElementRestIndicator) = match v with U3.Case1 o -> Some o | _ -> None
+        let isDotDotDotToken (v: BindingOrAssignmentElementRestIndicator) = match v with IsDotDotDotToken _ -> true | _ -> false
+        let asDotDotDotToken (v: BindingOrAssignmentElementRestIndicator) = match v with IsDotDotDotToken o -> Some o | _ -> None
+        let (|IsSpreadElement|_|) (v: BindingOrAssignmentElementRestIndicator) = if ts.isSpreadElement (unbox v) then Some (v :> obj :?> SpreadElement) else None
         let ofSpreadElement v: BindingOrAssignmentElementRestIndicator = v |> U3.Case2
-        let isSpreadElement (v: BindingOrAssignmentElementRestIndicator) = match v with U3.Case2 _ -> true | _ -> false
-        let asSpreadElement (v: BindingOrAssignmentElementRestIndicator) = match v with U3.Case2 o -> Some o | _ -> None
+        let isSpreadElement (v: BindingOrAssignmentElementRestIndicator) = match v with IsSpreadElement _ -> true | _ -> false
+        let asSpreadElement (v: BindingOrAssignmentElementRestIndicator) = match v with IsSpreadElement o -> Some o | _ -> None
+        let (|IsSpreadAssignment|_|) (v: BindingOrAssignmentElementRestIndicator) = if ts.isSpreadAssignment (unbox v) then Some (v :> obj :?> SpreadAssignment) else None
         let ofSpreadAssignment v: BindingOrAssignmentElementRestIndicator = v |> U3.Case3
-        let isSpreadAssignment (v: BindingOrAssignmentElementRestIndicator) = match v with U3.Case3 _ -> true | _ -> false
-        let asSpreadAssignment (v: BindingOrAssignmentElementRestIndicator) = match v with U3.Case3 o -> Some o | _ -> None
+        let isSpreadAssignment (v: BindingOrAssignmentElementRestIndicator) = match v with IsSpreadAssignment _ -> true | _ -> false
+        let asSpreadAssignment (v: BindingOrAssignmentElementRestIndicator) = match v with IsSpreadAssignment o -> Some o | _ -> None
+        let (|IsBindingOrAssignmentElementRestIndicator|_|) v = match unbox v with IsDotDotDotToken _ | IsSpreadElement _ | IsSpreadAssignment _ -> Some (v :> obj :?> BindingOrAssignmentElementRestIndicator) | _ -> None
 
     type BindingOrAssignmentElementTarget =
         U2<BindingOrAssignmentPattern, Expression>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module BindingOrAssignmentElementTarget =
+        let (|IsBindingOrAssignmentPattern|_|) (v: BindingOrAssignmentElementTarget) = match unbox v with BindingOrAssignmentPattern.IsBindingOrAssignmentPattern v -> Some (v :> obj :?> BindingOrAssignmentPattern) | _ -> None
         let ofBindingOrAssignmentPattern v: BindingOrAssignmentElementTarget = v |> U2.Case1
-        let isBindingOrAssignmentPattern (v: BindingOrAssignmentElementTarget) = match v with U2.Case1 _ -> true | _ -> false
-        let asBindingOrAssignmentPattern (v: BindingOrAssignmentElementTarget) = match v with U2.Case1 o -> Some o | _ -> None
+        let isBindingOrAssignmentPattern (v: BindingOrAssignmentElementTarget) = match v with IsBindingOrAssignmentPattern _ -> true | _ -> false
+        let asBindingOrAssignmentPattern (v: BindingOrAssignmentElementTarget) = match v with IsBindingOrAssignmentPattern o -> Some o | _ -> None
+        let ts_isExpression (v: BindingOrAssignmentElementTarget) = (not (isBindingOrAssignmentPattern v))
+        let (|IsExpression|_|) (v: BindingOrAssignmentElementTarget) = if ts_isExpression (unbox v) then Some (v :> obj :?> Expression) else None
         let ofExpression v: BindingOrAssignmentElementTarget = v |> U2.Case2
-        let isExpression (v: BindingOrAssignmentElementTarget) = match v with U2.Case2 _ -> true | _ -> false
-        let asExpression (v: BindingOrAssignmentElementTarget) = match v with U2.Case2 o -> Some o | _ -> None
+        let isExpression (v: BindingOrAssignmentElementTarget) = match v with IsExpression _ -> true | _ -> false
+        let asExpression (v: BindingOrAssignmentElementTarget) = match v with IsExpression o -> Some o | _ -> None
+        let (|IsBindingOrAssignmentElementTarget|_|) v = match unbox v with IsBindingOrAssignmentPattern _ | IsExpression _ -> Some (v :> obj :?> BindingOrAssignmentElementTarget) | _ -> None
 
     type ObjectBindingOrAssignmentPattern =
         U2<ObjectBindingPattern, ObjectLiteralExpression>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module ObjectBindingOrAssignmentPattern =
+        let (|IsObjectBindingPattern|_|) (v: ObjectBindingOrAssignmentPattern) = if ts.isObjectBindingPattern (unbox v) then Some (v :> obj :?> ObjectBindingPattern) else None
         let ofObjectBindingPattern v: ObjectBindingOrAssignmentPattern = v |> U2.Case1
-        let isObjectBindingPattern (v: ObjectBindingOrAssignmentPattern) = match v with U2.Case1 _ -> true | _ -> false
-        let asObjectBindingPattern (v: ObjectBindingOrAssignmentPattern) = match v with U2.Case1 o -> Some o | _ -> None
+        let isObjectBindingPattern (v: ObjectBindingOrAssignmentPattern) = match v with IsObjectBindingPattern _ -> true | _ -> false
+        let asObjectBindingPattern (v: ObjectBindingOrAssignmentPattern) = match v with IsObjectBindingPattern o -> Some o | _ -> None
+        let (|IsObjectLiteralExpression|_|) (v: ObjectBindingOrAssignmentPattern) = if ts.isObjectLiteralExpression (unbox v) then Some (v :> obj :?> ObjectLiteralExpression) else None
         let ofObjectLiteralExpression v: ObjectBindingOrAssignmentPattern = v |> U2.Case2
-        let isObjectLiteralExpression (v: ObjectBindingOrAssignmentPattern) = match v with U2.Case2 _ -> true | _ -> false
-        let asObjectLiteralExpression (v: ObjectBindingOrAssignmentPattern) = match v with U2.Case2 o -> Some o | _ -> None
+        let isObjectLiteralExpression (v: ObjectBindingOrAssignmentPattern) = match v with IsObjectLiteralExpression _ -> true | _ -> false
+        let asObjectLiteralExpression (v: ObjectBindingOrAssignmentPattern) = match v with IsObjectLiteralExpression o -> Some o | _ -> None
+        let (|IsObjectBindingOrAssignmentPattern|_|) v = match unbox v with IsObjectBindingPattern _ | IsObjectLiteralExpression _ -> Some (v :> obj :?> ObjectBindingOrAssignmentPattern) | _ -> None
 
     type ArrayBindingOrAssignmentPattern =
         U2<ArrayBindingPattern, ArrayLiteralExpression>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module ArrayBindingOrAssignmentPattern =
+        let (|IsArrayBindingPattern|_|) (v: ArrayBindingOrAssignmentPattern) = if ts.isArrayBindingPattern (unbox v) then Some (v :> obj :?> ArrayBindingPattern) else None
         let ofArrayBindingPattern v: ArrayBindingOrAssignmentPattern = v |> U2.Case1
-        let isArrayBindingPattern (v: ArrayBindingOrAssignmentPattern) = match v with U2.Case1 _ -> true | _ -> false
-        let asArrayBindingPattern (v: ArrayBindingOrAssignmentPattern) = match v with U2.Case1 o -> Some o | _ -> None
+        let isArrayBindingPattern (v: ArrayBindingOrAssignmentPattern) = match v with IsArrayBindingPattern _ -> true | _ -> false
+        let asArrayBindingPattern (v: ArrayBindingOrAssignmentPattern) = match v with IsArrayBindingPattern o -> Some o | _ -> None
+        let (|IsArrayLiteralExpression|_|) (v: ArrayBindingOrAssignmentPattern) = if ts.isArrayLiteralExpression (unbox v) then Some (v :> obj :?> ArrayLiteralExpression) else None
         let ofArrayLiteralExpression v: ArrayBindingOrAssignmentPattern = v |> U2.Case2
-        let isArrayLiteralExpression (v: ArrayBindingOrAssignmentPattern) = match v with U2.Case2 _ -> true | _ -> false
-        let asArrayLiteralExpression (v: ArrayBindingOrAssignmentPattern) = match v with U2.Case2 o -> Some o | _ -> None
+        let isArrayLiteralExpression (v: ArrayBindingOrAssignmentPattern) = match v with IsArrayLiteralExpression _ -> true | _ -> false
+        let asArrayLiteralExpression (v: ArrayBindingOrAssignmentPattern) = match v with IsArrayLiteralExpression o -> Some o | _ -> None
+        let (|IsArrayBindingOrAssignmentPattern|_|) v = match unbox v with IsArrayBindingPattern _ | IsArrayLiteralExpression _ -> Some (v :> obj :?> ArrayBindingOrAssignmentPattern) | _ -> None
 
     type AssignmentPattern =
         U2<ObjectLiteralExpression, ArrayLiteralExpression>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module AssignmentPattern =
+        let (|IsObjectLiteralExpression|_|) (v: AssignmentPattern) = if ts.isObjectLiteralExpression (unbox v) then Some (v :> obj :?> ObjectLiteralExpression) else None
         let ofObjectLiteralExpression v: AssignmentPattern = v |> U2.Case1
-        let isObjectLiteralExpression (v: AssignmentPattern) = match v with U2.Case1 _ -> true | _ -> false
-        let asObjectLiteralExpression (v: AssignmentPattern) = match v with U2.Case1 o -> Some o | _ -> None
+        let isObjectLiteralExpression (v: AssignmentPattern) = match v with IsObjectLiteralExpression _ -> true | _ -> false
+        let asObjectLiteralExpression (v: AssignmentPattern) = match v with IsObjectLiteralExpression o -> Some o | _ -> None
+        let (|IsArrayLiteralExpression|_|) (v: AssignmentPattern) = if ts.isArrayLiteralExpression (unbox v) then Some (v :> obj :?> ArrayLiteralExpression) else None
         let ofArrayLiteralExpression v: AssignmentPattern = v |> U2.Case2
-        let isArrayLiteralExpression (v: AssignmentPattern) = match v with U2.Case2 _ -> true | _ -> false
-        let asArrayLiteralExpression (v: AssignmentPattern) = match v with U2.Case2 o -> Some o | _ -> None
+        let isArrayLiteralExpression (v: AssignmentPattern) = match v with IsArrayLiteralExpression _ -> true | _ -> false
+        let asArrayLiteralExpression (v: AssignmentPattern) = match v with IsArrayLiteralExpression o -> Some o | _ -> None
+        let (|IsAssignmentPattern|_|) v = match unbox v with IsObjectLiteralExpression _ | IsArrayLiteralExpression _ -> Some (v :> obj :?> AssignmentPattern) | _ -> None
 
     type BindingOrAssignmentPattern =
         U2<ObjectBindingOrAssignmentPattern, ArrayBindingOrAssignmentPattern>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module BindingOrAssignmentPattern =
+        let (|IsObjectBindingOrAssignmentPattern|_|) (v: BindingOrAssignmentPattern) = match unbox v with ObjectBindingOrAssignmentPattern.IsObjectBindingOrAssignmentPattern v -> Some (v :> obj :?> ObjectBindingOrAssignmentPattern) | _ -> None
         let ofObjectBindingOrAssignmentPattern v: BindingOrAssignmentPattern = v |> U2.Case1
-        let isObjectBindingOrAssignmentPattern (v: BindingOrAssignmentPattern) = match v with U2.Case1 _ -> true | _ -> false
-        let asObjectBindingOrAssignmentPattern (v: BindingOrAssignmentPattern) = match v with U2.Case1 o -> Some o | _ -> None
+        let isObjectBindingOrAssignmentPattern (v: BindingOrAssignmentPattern) = match v with IsObjectBindingOrAssignmentPattern _ -> true | _ -> false
+        let asObjectBindingOrAssignmentPattern (v: BindingOrAssignmentPattern) = match v with IsObjectBindingOrAssignmentPattern o -> Some o | _ -> None
+        let (|IsArrayBindingOrAssignmentPattern|_|) (v: BindingOrAssignmentPattern) = match unbox v with ArrayBindingOrAssignmentPattern.IsArrayBindingOrAssignmentPattern v -> Some (v :> obj :?> ArrayBindingOrAssignmentPattern) | _ -> None
         let ofArrayBindingOrAssignmentPattern v: BindingOrAssignmentPattern = v |> U2.Case2
-        let isArrayBindingOrAssignmentPattern (v: BindingOrAssignmentPattern) = match v with U2.Case2 _ -> true | _ -> false
-        let asArrayBindingOrAssignmentPattern (v: BindingOrAssignmentPattern) = match v with U2.Case2 o -> Some o | _ -> None
+        let isArrayBindingOrAssignmentPattern (v: BindingOrAssignmentPattern) = match v with IsArrayBindingOrAssignmentPattern _ -> true | _ -> false
+        let asArrayBindingOrAssignmentPattern (v: BindingOrAssignmentPattern) = match v with IsArrayBindingOrAssignmentPattern o -> Some o | _ -> None
+        let (|IsBindingOrAssignmentPattern|_|) v = match unbox v with IsObjectBindingOrAssignmentPattern _ | IsArrayBindingOrAssignmentPattern _ -> Some (v :> obj :?> BindingOrAssignmentPattern) | _ -> None
 
     type [<AllowNullLiteral>] ConditionalExpression =
         inherit Expression
@@ -2254,12 +2432,17 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module ConciseBody =
+        let ts_isFunctionBody (v: Node) = (ts.isBlock v)
+        let (|IsFunctionBody|_|) (v: ConciseBody) = if ts_isFunctionBody (unbox v) then Some (v :> obj :?> FunctionBody) else None
         let ofFunctionBody v: ConciseBody = v |> U2.Case1
-        let isFunctionBody (v: ConciseBody) = match v with U2.Case1 _ -> true | _ -> false
-        let asFunctionBody (v: ConciseBody) = match v with U2.Case1 o -> Some o | _ -> None
+        let isFunctionBody (v: ConciseBody) = match v with IsFunctionBody _ -> true | _ -> false
+        let asFunctionBody (v: ConciseBody) = match v with IsFunctionBody o -> Some o | _ -> None
+        let ts_isExpression (v: Node) = (not (ts_isFunctionBody v))
+        let (|IsExpression|_|) (v: ConciseBody) = if ts_isExpression (unbox v) then Some (v :> obj :?> Expression) else None
         let ofExpression v: ConciseBody = v |> U2.Case2
-        let isExpression (v: ConciseBody) = match v with U2.Case2 _ -> true | _ -> false
-        let asExpression (v: ConciseBody) = match v with U2.Case2 o -> Some o | _ -> None
+        let isExpression (v: ConciseBody) = match v with IsExpression _ -> true | _ -> false
+        let asExpression (v: ConciseBody) = match v with IsExpression o -> Some o | _ -> None
+        let (|IsConciseBody|_|) v = match unbox v with IsFunctionBody _ | IsExpression _ -> Some (v :> obj :?> ConciseBody) | _ -> None
 
     type [<AllowNullLiteral>] FunctionExpression =
         inherit PrimaryExpression
@@ -2320,12 +2503,15 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module TemplateLiteral =
+        let (|IsTemplateExpression|_|) (v: TemplateLiteral) = if ts.isTemplateExpression (unbox v) then Some (v :> obj :?> TemplateExpression) else None
         let ofTemplateExpression v: TemplateLiteral = v |> U2.Case1
-        let isTemplateExpression (v: TemplateLiteral) = match v with U2.Case1 _ -> true | _ -> false
-        let asTemplateExpression (v: TemplateLiteral) = match v with U2.Case1 o -> Some o | _ -> None
+        let isTemplateExpression (v: TemplateLiteral) = match v with IsTemplateExpression _ -> true | _ -> false
+        let asTemplateExpression (v: TemplateLiteral) = match v with IsTemplateExpression o -> Some o | _ -> None
+        let (|IsNoSubstitutionTemplateLiteral|_|) (v: TemplateLiteral) = if ts.isNoSubstitutionTemplateLiteral (unbox v) then Some (v :> obj :?> NoSubstitutionTemplateLiteral) else None
         let ofNoSubstitutionTemplateLiteral v: TemplateLiteral = v |> U2.Case2
-        let isNoSubstitutionTemplateLiteral (v: TemplateLiteral) = match v with U2.Case2 _ -> true | _ -> false
-        let asNoSubstitutionTemplateLiteral (v: TemplateLiteral) = match v with U2.Case2 o -> Some o | _ -> None
+        let isNoSubstitutionTemplateLiteral (v: TemplateLiteral) = match v with IsNoSubstitutionTemplateLiteral _ -> true | _ -> false
+        let asNoSubstitutionTemplateLiteral (v: TemplateLiteral) = match v with IsNoSubstitutionTemplateLiteral o -> Some o | _ -> None
+        let (|IsTemplateLiteral|_|) v = match unbox v with IsTemplateExpression _ | IsNoSubstitutionTemplateLiteral _ -> Some (v :> obj :?> TemplateLiteral) | _ -> None
 
     type [<AllowNullLiteral>] TemplateExpression =
         inherit PrimaryExpression
@@ -2375,27 +2561,35 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module EntityNameExpression =
+        let (|IsIdentifier|_|) (v: EntityNameExpression) = if ts.isIdentifier (unbox v) then Some (v :> obj :?> Identifier) else None
         let ofIdentifier v: EntityNameExpression = v |> U3.Case1
-        let isIdentifier (v: EntityNameExpression) = match v with U3.Case1 _ -> true | _ -> false
-        let asIdentifier (v: EntityNameExpression) = match v with U3.Case1 o -> Some o | _ -> None
+        let isIdentifier (v: EntityNameExpression) = match v with IsIdentifier _ -> true | _ -> false
+        let asIdentifier (v: EntityNameExpression) = match v with IsIdentifier o -> Some o | _ -> None
+        let rec ts_isPropertyAccessEntityNameExpression (v: Node) = (ts.isPropertyAccessExpression v && (ts.isIdentifier v || ts_isPropertyAccessEntityNameExpression((v :?> PropertyAccessExpression).expression)))
+        let (|IsPropertyAccessEntityNameExpression|_|) (v: EntityNameExpression) = if ts_isPropertyAccessEntityNameExpression (unbox v) then Some (v :> obj :?> PropertyAccessEntityNameExpression) else None
         let ofPropertyAccessEntityNameExpression v: EntityNameExpression = v |> U3.Case2
-        let isPropertyAccessEntityNameExpression (v: EntityNameExpression) = match v with U3.Case2 _ -> true | _ -> false
-        let asPropertyAccessEntityNameExpression (v: EntityNameExpression) = match v with U3.Case2 o -> Some o | _ -> None
+        let isPropertyAccessEntityNameExpression (v: EntityNameExpression) = match v with IsPropertyAccessEntityNameExpression _ -> true | _ -> false
+        let asPropertyAccessEntityNameExpression (v: EntityNameExpression) = match v with IsPropertyAccessEntityNameExpression o -> Some o | _ -> None
+        let (|IsParenthesizedExpression|_|) (v: EntityNameExpression) = if ts.isParenthesizedExpression (unbox v) then Some (v :> obj :?> ParenthesizedExpression) else None
         let ofParenthesizedExpression v: EntityNameExpression = v |> U3.Case3
-        let isParenthesizedExpression (v: EntityNameExpression) = match v with U3.Case3 _ -> true | _ -> false
-        let asParenthesizedExpression (v: EntityNameExpression) = match v with U3.Case3 o -> Some o | _ -> None
+        let isParenthesizedExpression (v: EntityNameExpression) = match v with IsParenthesizedExpression _ -> true | _ -> false
+        let asParenthesizedExpression (v: EntityNameExpression) = match v with IsParenthesizedExpression o -> Some o | _ -> None
+        let (|IsEntityNameExpression|_|) v = match unbox v with IsIdentifier _ | IsPropertyAccessEntityNameExpression _ | IsParenthesizedExpression _ -> Some (v :> obj :?> EntityNameExpression) | _ -> None
 
     type EntityNameOrEntityNameExpression =
         U2<EntityName, EntityNameExpression>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module EntityNameOrEntityNameExpression =
+        let (|IsEntityName|_|) (v: EntityNameOrEntityNameExpression) = if ts.isEntityName (unbox v) then Some (v :> obj :?> EntityName) else None
         let ofEntityName v: EntityNameOrEntityNameExpression = v |> U2.Case1
-        let isEntityName (v: EntityNameOrEntityNameExpression) = match v with U2.Case1 _ -> true | _ -> false
-        let asEntityName (v: EntityNameOrEntityNameExpression) = match v with U2.Case1 o -> Some o | _ -> None
+        let isEntityName (v: EntityNameOrEntityNameExpression) = match v with IsEntityName _ -> true | _ -> false
+        let asEntityName (v: EntityNameOrEntityNameExpression) = match v with IsEntityName o -> Some o | _ -> None
+        let (|IsEntityNameExpression|_|) (v: EntityNameOrEntityNameExpression) = match unbox v with EntityNameExpression.IsEntityNameExpression v -> Some (v :> obj :?> EntityNameExpression) | _ -> None
         let ofEntityNameExpression v: EntityNameOrEntityNameExpression = v |> U2.Case2
-        let isEntityNameExpression (v: EntityNameOrEntityNameExpression) = match v with U2.Case2 _ -> true | _ -> false
-        let asEntityNameExpression (v: EntityNameOrEntityNameExpression) = match v with U2.Case2 o -> Some o | _ -> None
+        let isEntityNameExpression (v: EntityNameOrEntityNameExpression) = match v with IsEntityNameExpression _ -> true | _ -> false
+        let asEntityNameExpression (v: EntityNameOrEntityNameExpression) = match v with IsEntityNameExpression o -> Some o | _ -> None
+        let (|IsEntityNameOrEntityNameExpression|_|) v = match unbox v with IsEntityName _ | IsEntityNameExpression _ -> Some (v :> obj :?> EntityNameOrEntityNameExpression) | _ -> None
 
     type [<AllowNullLiteral>] PropertyAccessExpression =
         inherit MemberExpression
@@ -2429,12 +2623,18 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module SuperProperty =
+        let ts_isSuperExpression (v: Node) = (v.kind = SyntaxKind.SuperKeyword)
+        let ts_isSuperPropertyAccessExpression (v: Node) = (ts.isPropertyAccessExpression v && (ts.isIdentifier v || ts_isSuperExpression((v :?> PropertyAccessExpression).expression)))
+        let (|IsSuperPropertyAccessExpression|_|) (v: SuperProperty) = if ts_isSuperPropertyAccessExpression (unbox v) then Some (v :> obj :?> SuperPropertyAccessExpression) else None
         let ofSuperPropertyAccessExpression v: SuperProperty = v |> U2.Case1
-        let isSuperPropertyAccessExpression (v: SuperProperty) = match v with U2.Case1 _ -> true | _ -> false
-        let asSuperPropertyAccessExpression (v: SuperProperty) = match v with U2.Case1 o -> Some o | _ -> None
+        let isSuperPropertyAccessExpression (v: SuperProperty) = match v with IsSuperPropertyAccessExpression _ -> true | _ -> false
+        let asSuperPropertyAccessExpression (v: SuperProperty) = match v with IsSuperPropertyAccessExpression o -> Some o | _ -> None
+        let ts_isSuperElementAccessExpression (v: Node) = (ts.isElementAccessExpression v && (ts.isIdentifier v || ts_isSuperExpression((v :?> PropertyAccessExpression).expression)))
+        let (|IsSuperElementAccessExpression|_|) (v: SuperProperty) = if ts_isSuperElementAccessExpression (unbox v) then Some (v :> obj :?> SuperElementAccessExpression) else None
         let ofSuperElementAccessExpression v: SuperProperty = v |> U2.Case2
-        let isSuperElementAccessExpression (v: SuperProperty) = match v with U2.Case2 _ -> true | _ -> false
-        let asSuperElementAccessExpression (v: SuperProperty) = match v with U2.Case2 o -> Some o | _ -> None
+        let isSuperElementAccessExpression (v: SuperProperty) = match v with IsSuperElementAccessExpression _ -> true | _ -> false
+        let asSuperElementAccessExpression (v: SuperProperty) = match v with IsSuperElementAccessExpression o -> Some o | _ -> None
+        let (|IsSuperProperty|_|) v = match unbox v with IsSuperPropertyAccessExpression _ | IsSuperElementAccessExpression _ -> Some (v :> obj :?> SuperProperty) | _ -> None
 
     type [<AllowNullLiteral>] CallExpression =
         inherit LeftHandSideExpression
@@ -2478,21 +2678,27 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module CallLikeExpression =
+        let (|IsCallExpression|_|) (v: CallLikeExpression) = if ts.isCallExpression (unbox v) then Some (v :> obj :?> CallExpression) else None
         let ofCallExpression v: CallLikeExpression = v |> U5.Case1
-        let isCallExpression (v: CallLikeExpression) = match v with U5.Case1 _ -> true | _ -> false
-        let asCallExpression (v: CallLikeExpression) = match v with U5.Case1 o -> Some o | _ -> None
+        let isCallExpression (v: CallLikeExpression) = match v with IsCallExpression _ -> true | _ -> false
+        let asCallExpression (v: CallLikeExpression) = match v with IsCallExpression o -> Some o | _ -> None
+        let (|IsNewExpression|_|) (v: CallLikeExpression) = if ts.isNewExpression (unbox v) then Some (v :> obj :?> NewExpression) else None
         let ofNewExpression v: CallLikeExpression = v |> U5.Case2
-        let isNewExpression (v: CallLikeExpression) = match v with U5.Case2 _ -> true | _ -> false
-        let asNewExpression (v: CallLikeExpression) = match v with U5.Case2 o -> Some o | _ -> None
+        let isNewExpression (v: CallLikeExpression) = match v with IsNewExpression _ -> true | _ -> false
+        let asNewExpression (v: CallLikeExpression) = match v with IsNewExpression o -> Some o | _ -> None
+        let (|IsTaggedTemplateExpression|_|) (v: CallLikeExpression) = if ts.isTaggedTemplateExpression (unbox v) then Some (v :> obj :?> TaggedTemplateExpression) else None
         let ofTaggedTemplateExpression v: CallLikeExpression = v |> U5.Case3
-        let isTaggedTemplateExpression (v: CallLikeExpression) = match v with U5.Case3 _ -> true | _ -> false
-        let asTaggedTemplateExpression (v: CallLikeExpression) = match v with U5.Case3 o -> Some o | _ -> None
+        let isTaggedTemplateExpression (v: CallLikeExpression) = match v with IsTaggedTemplateExpression _ -> true | _ -> false
+        let asTaggedTemplateExpression (v: CallLikeExpression) = match v with IsTaggedTemplateExpression o -> Some o | _ -> None
+        let (|IsDecorator|_|) (v: CallLikeExpression) = if ts.isDecorator (unbox v) then Some (v :> obj :?> Decorator) else None
         let ofDecorator v: CallLikeExpression = v |> U5.Case4
-        let isDecorator (v: CallLikeExpression) = match v with U5.Case4 _ -> true | _ -> false
-        let asDecorator (v: CallLikeExpression) = match v with U5.Case4 o -> Some o | _ -> None
+        let isDecorator (v: CallLikeExpression) = match v with IsDecorator _ -> true | _ -> false
+        let asDecorator (v: CallLikeExpression) = match v with IsDecorator o -> Some o | _ -> None
+        let (|IsJsxOpeningLikeElement|_|) (v: CallLikeExpression) = if ts.isJsxOpeningLikeElement (unbox v) then Some (v :> obj :?> JsxOpeningLikeElement) else None
         let ofJsxOpeningLikeElement v: CallLikeExpression = v |> U5.Case5
-        let isJsxOpeningLikeElement (v: CallLikeExpression) = match v with U5.Case5 _ -> true | _ -> false
-        let asJsxOpeningLikeElement (v: CallLikeExpression) = match v with U5.Case5 o -> Some o | _ -> None
+        let isJsxOpeningLikeElement (v: CallLikeExpression) = match v with IsJsxOpeningLikeElement _ -> true | _ -> false
+        let asJsxOpeningLikeElement (v: CallLikeExpression) = match v with IsJsxOpeningLikeElement o -> Some o | _ -> None
+        let (|IsCallLikeExpression|_|) v = match unbox v with IsCallExpression _ | IsNewExpression _ | IsTaggedTemplateExpression _ | IsDecorator _ | IsJsxOpeningLikeElement _ -> Some (v :> obj :?> CallLikeExpression) | _ -> None
 
     type [<AllowNullLiteral>] AsExpression =
         inherit Expression
@@ -2511,12 +2717,15 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module AssertionExpression =
+        let (|IsTypeAssertion|_|) (v: AssertionExpression) = if ts.isTypeAssertion (unbox v) then Some (v :> obj :?> TypeAssertion) else None
         let ofTypeAssertion v: AssertionExpression = v |> U2.Case1
-        let isTypeAssertion (v: AssertionExpression) = match v with U2.Case1 _ -> true | _ -> false
-        let asTypeAssertion (v: AssertionExpression) = match v with U2.Case1 o -> Some o | _ -> None
+        let isTypeAssertion (v: AssertionExpression) = match v with IsTypeAssertion _ -> true | _ -> false
+        let asTypeAssertion (v: AssertionExpression) = match v with IsTypeAssertion o -> Some o | _ -> None
+        let (|IsAsExpression|_|) (v: AssertionExpression) = if ts.isAsExpression (unbox v) then Some (v :> obj :?> AsExpression) else None
         let ofAsExpression v: AssertionExpression = v |> U2.Case2
-        let isAsExpression (v: AssertionExpression) = match v with U2.Case2 _ -> true | _ -> false
-        let asAsExpression (v: AssertionExpression) = match v with U2.Case2 o -> Some o | _ -> None
+        let isAsExpression (v: AssertionExpression) = match v with IsAsExpression _ -> true | _ -> false
+        let asAsExpression (v: AssertionExpression) = match v with IsAsExpression o -> Some o | _ -> None
+        let (|IsAssertionExpression|_|) v = match unbox v with IsTypeAssertion _ | IsAsExpression _ -> Some (v :> obj :?> AssertionExpression) | _ -> None
 
     type [<AllowNullLiteral>] NonNullExpression =
         inherit LeftHandSideExpression
@@ -2541,36 +2750,46 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module JsxOpeningLikeElement =
+        let (|IsJsxSelfClosingElement|_|) (v: JsxOpeningLikeElement) = if ts.isJsxSelfClosingElement (unbox v) then Some (v :> obj :?> JsxSelfClosingElement) else None
         let ofJsxSelfClosingElement v: JsxOpeningLikeElement = v |> U2.Case1
-        let isJsxSelfClosingElement (v: JsxOpeningLikeElement) = match v with U2.Case1 _ -> true | _ -> false
-        let asJsxSelfClosingElement (v: JsxOpeningLikeElement) = match v with U2.Case1 o -> Some o | _ -> None
+        let isJsxSelfClosingElement (v: JsxOpeningLikeElement) = match v with IsJsxSelfClosingElement _ -> true | _ -> false
+        let asJsxSelfClosingElement (v: JsxOpeningLikeElement) = match v with IsJsxSelfClosingElement o -> Some o | _ -> None
+        let (|IsJsxOpeningElement|_|) (v: JsxOpeningLikeElement) = if ts.isJsxOpeningElement (unbox v) then Some (v :> obj :?> JsxOpeningElement) else None
         let ofJsxOpeningElement v: JsxOpeningLikeElement = v |> U2.Case2
-        let isJsxOpeningElement (v: JsxOpeningLikeElement) = match v with U2.Case2 _ -> true | _ -> false
-        let asJsxOpeningElement (v: JsxOpeningLikeElement) = match v with U2.Case2 o -> Some o | _ -> None
+        let isJsxOpeningElement (v: JsxOpeningLikeElement) = match v with IsJsxOpeningElement _ -> true | _ -> false
+        let asJsxOpeningElement (v: JsxOpeningLikeElement) = match v with IsJsxOpeningElement o -> Some o | _ -> None
+        let (|IsJsxOpeningLikeElement|_|) v = match unbox v with IsJsxSelfClosingElement _ | IsJsxOpeningElement _ -> Some (v :> obj :?> JsxOpeningLikeElement) | _ -> None
 
     type JsxAttributeLike =
         U2<JsxAttribute, JsxSpreadAttribute>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module JsxAttributeLike =
+        let (|IsJsxAttribute|_|) (v: JsxAttributeLike) = if ts.isJsxAttribute (unbox v) then Some (v :> obj :?> JsxAttribute) else None
         let ofJsxAttribute v: JsxAttributeLike = v |> U2.Case1
-        let isJsxAttribute (v: JsxAttributeLike) = match v with U2.Case1 _ -> true | _ -> false
-        let asJsxAttribute (v: JsxAttributeLike) = match v with U2.Case1 o -> Some o | _ -> None
+        let isJsxAttribute (v: JsxAttributeLike) = match v with IsJsxAttribute _ -> true | _ -> false
+        let asJsxAttribute (v: JsxAttributeLike) = match v with IsJsxAttribute o -> Some o | _ -> None
+        let (|IsJsxSpreadAttribute|_|) (v: JsxAttributeLike) = if ts.isJsxSpreadAttribute (unbox v) then Some (v :> obj :?> JsxSpreadAttribute) else None
         let ofJsxSpreadAttribute v: JsxAttributeLike = v |> U2.Case2
-        let isJsxSpreadAttribute (v: JsxAttributeLike) = match v with U2.Case2 _ -> true | _ -> false
-        let asJsxSpreadAttribute (v: JsxAttributeLike) = match v with U2.Case2 o -> Some o | _ -> None
+        let isJsxSpreadAttribute (v: JsxAttributeLike) = match v with IsJsxSpreadAttribute _ -> true | _ -> false
+        let asJsxSpreadAttribute (v: JsxAttributeLike) = match v with IsJsxSpreadAttribute o -> Some o | _ -> None
+        let (|IsJsxAttributeLike|_|) v = match unbox v with IsJsxAttribute _ | IsJsxSpreadAttribute _ -> Some (v :> obj :?> JsxAttributeLike) | _ -> None
 
     type JsxTagNameExpression =
         U2<PrimaryExpression, PropertyAccessExpression>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module JsxTagNameExpression =
+        let ts_isPrimaryExpression (v: Node) = (v.kind = SyntaxKind.ThisKeyword || v.kind = SyntaxKind.Identifier)
+        let (|IsPrimaryExpression|_|) (v: JsxTagNameExpression) = if ts_isPrimaryExpression (unbox v) then Some (v :> obj :?> PrimaryExpression) else None
         let ofPrimaryExpression v: JsxTagNameExpression = v |> U2.Case1
-        let isPrimaryExpression (v: JsxTagNameExpression) = match v with U2.Case1 _ -> true | _ -> false
-        let asPrimaryExpression (v: JsxTagNameExpression) = match v with U2.Case1 o -> Some o | _ -> None
+        let isPrimaryExpression (v: JsxTagNameExpression) = match v with IsPrimaryExpression _ -> true | _ -> false
+        let asPrimaryExpression (v: JsxTagNameExpression) = match v with IsPrimaryExpression o -> Some o | _ -> None
+        let (|IsPropertyAccessExpression|_|) (v: JsxTagNameExpression) = if ts.isPropertyAccessExpression (unbox v) then Some (v :> obj :?> PropertyAccessExpression) else None
         let ofPropertyAccessExpression v: JsxTagNameExpression = v |> U2.Case2
-        let isPropertyAccessExpression (v: JsxTagNameExpression) = match v with U2.Case2 _ -> true | _ -> false
-        let asPropertyAccessExpression (v: JsxTagNameExpression) = match v with U2.Case2 o -> Some o | _ -> None
+        let isPropertyAccessExpression (v: JsxTagNameExpression) = match v with IsPropertyAccessExpression _ -> true | _ -> false
+        let asPropertyAccessExpression (v: JsxTagNameExpression) = match v with IsPropertyAccessExpression o -> Some o | _ -> None
+        let (|IsJsxTagNameExpression|_|) v = match unbox v with IsPrimaryExpression _ | IsPropertyAccessExpression _ -> Some (v :> obj :?> JsxTagNameExpression) | _ -> None
 
     type [<AllowNullLiteral>] JsxAttributes =
         inherit ObjectLiteralExpressionBase<JsxAttributeLike>
@@ -2626,18 +2845,23 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module JsxChild =
+        let (|IsJsxText|_|) (v: JsxChild) = if ts.isJsxText (unbox v) then Some (v :> obj :?> JsxText) else None
         let ofJsxText v: JsxChild = v |> U4.Case1
-        let isJsxText (v: JsxChild) = match v with U4.Case1 _ -> true | _ -> false
-        let asJsxText (v: JsxChild) = match v with U4.Case1 o -> Some o | _ -> None
+        let isJsxText (v: JsxChild) = match v with IsJsxText _ -> true | _ -> false
+        let asJsxText (v: JsxChild) = match v with IsJsxText o -> Some o | _ -> None
+        let (|IsJsxExpression|_|) (v: JsxChild) = if ts.isJsxExpression (unbox v) then Some (v :> obj :?> JsxExpression) else None
         let ofJsxExpression v: JsxChild = v |> U4.Case2
-        let isJsxExpression (v: JsxChild) = match v with U4.Case2 _ -> true | _ -> false
-        let asJsxExpression (v: JsxChild) = match v with U4.Case2 o -> Some o | _ -> None
+        let isJsxExpression (v: JsxChild) = match v with IsJsxExpression _ -> true | _ -> false
+        let asJsxExpression (v: JsxChild) = match v with IsJsxExpression o -> Some o | _ -> None
+        let (|IsJsxElement|_|) (v: JsxChild) = if ts.isJsxElement (unbox v) then Some (v :> obj :?> JsxElement) else None
         let ofJsxElement v: JsxChild = v |> U4.Case3
-        let isJsxElement (v: JsxChild) = match v with U4.Case3 _ -> true | _ -> false
-        let asJsxElement (v: JsxChild) = match v with U4.Case3 o -> Some o | _ -> None
+        let isJsxElement (v: JsxChild) = match v with IsJsxElement _ -> true | _ -> false
+        let asJsxElement (v: JsxChild) = match v with IsJsxElement o -> Some o | _ -> None
+        let (|IsJsxSelfClosingElement|_|) (v: JsxChild) = if ts.isJsxSelfClosingElement (unbox v) then Some (v :> obj :?> JsxSelfClosingElement) else None
         let ofJsxSelfClosingElement v: JsxChild = v |> U4.Case4
-        let isJsxSelfClosingElement (v: JsxChild) = match v with U4.Case4 _ -> true | _ -> false
-        let asJsxSelfClosingElement (v: JsxChild) = match v with U4.Case4 o -> Some o | _ -> None
+        let isJsxSelfClosingElement (v: JsxChild) = match v with IsJsxSelfClosingElement _ -> true | _ -> false
+        let asJsxSelfClosingElement (v: JsxChild) = match v with IsJsxSelfClosingElement o -> Some o | _ -> None
+        let (|IsJsxChild|_|) v = match unbox v with IsJsxText _ | IsJsxExpression _ | IsJsxElement _ | IsJsxSelfClosingElement _ -> Some (v :> obj :?> JsxChild) | _ -> None
 
     type [<AllowNullLiteral>] Statement =
         inherit Node
@@ -2674,18 +2898,23 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module BlockLike =
+        let (|IsSourceFile|_|) (v: BlockLike) = if ts.isSourceFile (unbox v) then Some (v :> obj :?> SourceFile) else None
         let ofSourceFile v: BlockLike = v |> U4.Case1
-        let isSourceFile (v: BlockLike) = match v with U4.Case1 _ -> true | _ -> false
-        let asSourceFile (v: BlockLike) = match v with U4.Case1 o -> Some o | _ -> None
+        let isSourceFile (v: BlockLike) = match v with IsSourceFile _ -> true | _ -> false
+        let asSourceFile (v: BlockLike) = match v with IsSourceFile o -> Some o | _ -> None
+        let (|IsBlock|_|) (v: BlockLike) = if ts.isBlock (unbox v) then Some (v :> obj :?> Block) else None
         let ofBlock v: BlockLike = v |> U4.Case2
-        let isBlock (v: BlockLike) = match v with U4.Case2 _ -> true | _ -> false
-        let asBlock (v: BlockLike) = match v with U4.Case2 o -> Some o | _ -> None
+        let isBlock (v: BlockLike) = match v with IsBlock _ -> true | _ -> false
+        let asBlock (v: BlockLike) = match v with IsBlock o -> Some o | _ -> None
+        let (|IsModuleBlock|_|) (v: BlockLike) = if ts.isModuleBlock (unbox v) then Some (v :> obj :?> ModuleBlock) else None
         let ofModuleBlock v: BlockLike = v |> U4.Case3
-        let isModuleBlock (v: BlockLike) = match v with U4.Case3 _ -> true | _ -> false
-        let asModuleBlock (v: BlockLike) = match v with U4.Case3 o -> Some o | _ -> None
+        let isModuleBlock (v: BlockLike) = match v with IsModuleBlock _ -> true | _ -> false
+        let asModuleBlock (v: BlockLike) = match v with IsModuleBlock o -> Some o | _ -> None
+        let (|IsCaseOrDefaultClause|_|) (v: BlockLike) = if ts.isCaseOrDefaultClause (unbox v) then Some (v :> obj :?> CaseOrDefaultClause) else None
         let ofCaseOrDefaultClause v: BlockLike = v |> U4.Case4
-        let isCaseOrDefaultClause (v: BlockLike) = match v with U4.Case4 _ -> true | _ -> false
-        let asCaseOrDefaultClause (v: BlockLike) = match v with U4.Case4 o -> Some o | _ -> None
+        let isCaseOrDefaultClause (v: BlockLike) = match v with IsCaseOrDefaultClause _ -> true | _ -> false
+        let asCaseOrDefaultClause (v: BlockLike) = match v with IsCaseOrDefaultClause o -> Some o | _ -> None
+        let (|IsBlockLike|_|) v = match unbox v with IsSourceFile _ | IsBlock _ | IsModuleBlock _ | IsCaseOrDefaultClause _ -> Some (v :> obj :?> BlockLike) | _ -> None
 
     type [<AllowNullLiteral>] Block =
         inherit Statement
@@ -2730,12 +2959,16 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module ForInitializer =
+        let (|IsVariableDeclarationList|_|) (v: ForInitializer) = if ts.isVariableDeclarationList (unbox v) then Some (v :> obj :?> VariableDeclarationList) else None
         let ofVariableDeclarationList v: ForInitializer = v |> U2.Case1
-        let isVariableDeclarationList (v: ForInitializer) = match v with U2.Case1 _ -> true | _ -> false
-        let asVariableDeclarationList (v: ForInitializer) = match v with U2.Case1 o -> Some o | _ -> None
+        let isVariableDeclarationList (v: ForInitializer) = match v with IsVariableDeclarationList _ -> true | _ -> false
+        let asVariableDeclarationList (v: ForInitializer) = match v with IsVariableDeclarationList o -> Some o | _ -> None
+        let ts_isExpression (v: ForInitializer) = (not (isVariableDeclarationList v))
+        let (|IsExpression|_|) (v: ForInitializer) = if ts_isExpression (unbox v) then Some (v :> obj :?> Expression) else None
         let ofExpression v: ForInitializer = v |> U2.Case2
-        let isExpression (v: ForInitializer) = match v with U2.Case2 _ -> true | _ -> false
-        let asExpression (v: ForInitializer) = match v with U2.Case2 o -> Some o | _ -> None
+        let isExpression (v: ForInitializer) = match v with IsExpression _ -> true | _ -> false
+        let asExpression (v: ForInitializer) = match v with IsExpression o -> Some o | _ -> None
+        let (|IsForInitializer|_|) v = match unbox v with IsVariableDeclarationList _ | IsExpression _ -> Some (v :> obj :?> ForInitializer) | _ -> None
 
     type [<AllowNullLiteral>] ForStatement =
         inherit IterationStatement
@@ -2749,12 +2982,15 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module ForInOrOfStatement =
+        let (|IsForInStatement|_|) (v: ForInOrOfStatement) = if ts.isForInStatement (unbox v) then Some (v :> obj :?> ForInStatement) else None
         let ofForInStatement v: ForInOrOfStatement = v |> U2.Case1
-        let isForInStatement (v: ForInOrOfStatement) = match v with U2.Case1 _ -> true | _ -> false
-        let asForInStatement (v: ForInOrOfStatement) = match v with U2.Case1 o -> Some o | _ -> None
+        let isForInStatement (v: ForInOrOfStatement) = match v with IsForInStatement _ -> true | _ -> false
+        let asForInStatement (v: ForInOrOfStatement) = match v with IsForInStatement o -> Some o | _ -> None
+        let (|IsForOfStatement|_|) (v: ForInOrOfStatement) = if ts.isForOfStatement (unbox v) then Some (v :> obj :?> ForOfStatement) else None
         let ofForOfStatement v: ForInOrOfStatement = v |> U2.Case2
-        let isForOfStatement (v: ForInOrOfStatement) = match v with U2.Case2 _ -> true | _ -> false
-        let asForOfStatement (v: ForInOrOfStatement) = match v with U2.Case2 o -> Some o | _ -> None
+        let isForOfStatement (v: ForInOrOfStatement) = match v with IsForOfStatement _ -> true | _ -> false
+        let asForOfStatement (v: ForInOrOfStatement) = match v with IsForOfStatement o -> Some o | _ -> None
+        let (|IsForInOrOfStatement|_|) v = match unbox v with IsForInStatement _ | IsForOfStatement _ -> Some (v :> obj :?> ForInOrOfStatement) | _ -> None
 
     type [<AllowNullLiteral>] ForInStatement =
         inherit IterationStatement
@@ -2784,12 +3020,15 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module BreakOrContinueStatement =
+        let (|IsBreakStatement|_|) (v: BreakOrContinueStatement) = if ts.isBreakStatement (unbox v) then Some (v :> obj :?> BreakStatement) else None
         let ofBreakStatement v: BreakOrContinueStatement = v |> U2.Case1
-        let isBreakStatement (v: BreakOrContinueStatement) = match v with U2.Case1 _ -> true | _ -> false
-        let asBreakStatement (v: BreakOrContinueStatement) = match v with U2.Case1 o -> Some o | _ -> None
+        let isBreakStatement (v: BreakOrContinueStatement) = match v with IsBreakStatement _ -> true | _ -> false
+        let asBreakStatement (v: BreakOrContinueStatement) = match v with IsBreakStatement o -> Some o | _ -> None
+        let (|IsContinueStatement|_|) (v: BreakOrContinueStatement) = if ts.isContinueStatement (unbox v) then Some (v :> obj :?> ContinueStatement) else None
         let ofContinueStatement v: BreakOrContinueStatement = v |> U2.Case2
-        let isContinueStatement (v: BreakOrContinueStatement) = match v with U2.Case2 _ -> true | _ -> false
-        let asContinueStatement (v: BreakOrContinueStatement) = match v with U2.Case2 o -> Some o | _ -> None
+        let isContinueStatement (v: BreakOrContinueStatement) = match v with IsContinueStatement _ -> true | _ -> false
+        let asContinueStatement (v: BreakOrContinueStatement) = match v with IsContinueStatement o -> Some o | _ -> None
+        let (|IsBreakOrContinueStatement|_|) v = match unbox v with IsBreakStatement _ | IsContinueStatement _ -> Some (v :> obj :?> BreakOrContinueStatement) | _ -> None
 
     type [<AllowNullLiteral>] ReturnStatement =
         inherit Statement
@@ -2833,12 +3072,15 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module CaseOrDefaultClause =
+        let (|IsCaseClause|_|) (v: CaseOrDefaultClause) = if ts.isCaseClause (unbox v) then Some (v :> obj :?> CaseClause) else None
         let ofCaseClause v: CaseOrDefaultClause = v |> U2.Case1
-        let isCaseClause (v: CaseOrDefaultClause) = match v with U2.Case1 _ -> true | _ -> false
-        let asCaseClause (v: CaseOrDefaultClause) = match v with U2.Case1 o -> Some o | _ -> None
+        let isCaseClause (v: CaseOrDefaultClause) = match v with IsCaseClause _ -> true | _ -> false
+        let asCaseClause (v: CaseOrDefaultClause) = match v with IsCaseClause o -> Some o | _ -> None
+        let (|IsDefaultClause|_|) (v: CaseOrDefaultClause) = if ts.isDefaultClause (unbox v) then Some (v :> obj :?> DefaultClause) else None
         let ofDefaultClause v: CaseOrDefaultClause = v |> U2.Case2
-        let isDefaultClause (v: CaseOrDefaultClause) = match v with U2.Case2 _ -> true | _ -> false
-        let asDefaultClause (v: CaseOrDefaultClause) = match v with U2.Case2 o -> Some o | _ -> None
+        let isDefaultClause (v: CaseOrDefaultClause) = match v with IsDefaultClause _ -> true | _ -> false
+        let asDefaultClause (v: CaseOrDefaultClause) = match v with IsDefaultClause o -> Some o | _ -> None
+        let (|IsCaseOrDefaultClause|_|) v = match unbox v with IsCaseClause _ | IsDefaultClause _ -> Some (v :> obj :?> CaseOrDefaultClause) | _ -> None
 
     type [<AllowNullLiteral>] LabeledStatement =
         inherit Statement
@@ -2871,21 +3113,27 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module DeclarationWithTypeParameters =
+        let (|IsSignatureDeclaration|_|) (v: DeclarationWithTypeParameters) = match unbox v with SignatureDeclaration.IsSignatureDeclaration v -> Some (v :> obj :?> SignatureDeclaration) | _ -> None
         let ofSignatureDeclaration v: DeclarationWithTypeParameters = v |> U5.Case1
-        let isSignatureDeclaration (v: DeclarationWithTypeParameters) = match v with U5.Case1 _ -> true | _ -> false
-        let asSignatureDeclaration (v: DeclarationWithTypeParameters) = match v with U5.Case1 o -> Some o | _ -> None
+        let isSignatureDeclaration (v: DeclarationWithTypeParameters) = match v with IsSignatureDeclaration _ -> true | _ -> false
+        let asSignatureDeclaration (v: DeclarationWithTypeParameters) = match v with IsSignatureDeclaration o -> Some o | _ -> None
+        let (|IsClassLikeDeclaration|_|) (v: DeclarationWithTypeParameters) = match unbox v with ClassLikeDeclaration.IsClassLikeDeclaration v -> Some (v :> obj :?> ClassLikeDeclaration) | _ -> None
         let ofClassLikeDeclaration v: DeclarationWithTypeParameters = v |> U5.Case2
-        let isClassLikeDeclaration (v: DeclarationWithTypeParameters) = match v with U5.Case2 _ -> true | _ -> false
-        let asClassLikeDeclaration (v: DeclarationWithTypeParameters) = match v with U5.Case2 o -> Some o | _ -> None
+        let isClassLikeDeclaration (v: DeclarationWithTypeParameters) = match v with IsClassLikeDeclaration _ -> true | _ -> false
+        let asClassLikeDeclaration (v: DeclarationWithTypeParameters) = match v with IsClassLikeDeclaration o -> Some o | _ -> None
+        let (|IsInterfaceDeclaration|_|) (v: DeclarationWithTypeParameters) = if ts.isInterfaceDeclaration (unbox v) then Some (v :> obj :?> InterfaceDeclaration) else None
         let ofInterfaceDeclaration v: DeclarationWithTypeParameters = v |> U5.Case3
-        let isInterfaceDeclaration (v: DeclarationWithTypeParameters) = match v with U5.Case3 _ -> true | _ -> false
-        let asInterfaceDeclaration (v: DeclarationWithTypeParameters) = match v with U5.Case3 o -> Some o | _ -> None
+        let isInterfaceDeclaration (v: DeclarationWithTypeParameters) = match v with IsInterfaceDeclaration _ -> true | _ -> false
+        let asInterfaceDeclaration (v: DeclarationWithTypeParameters) = match v with IsInterfaceDeclaration o -> Some o | _ -> None
+        let (|IsTypeAliasDeclaration|_|) (v: DeclarationWithTypeParameters) = if ts.isTypeAliasDeclaration (unbox v) then Some (v :> obj :?> TypeAliasDeclaration) else None
         let ofTypeAliasDeclaration v: DeclarationWithTypeParameters = v |> U5.Case4
-        let isTypeAliasDeclaration (v: DeclarationWithTypeParameters) = match v with U5.Case4 _ -> true | _ -> false
-        let asTypeAliasDeclaration (v: DeclarationWithTypeParameters) = match v with U5.Case4 o -> Some o | _ -> None
+        let isTypeAliasDeclaration (v: DeclarationWithTypeParameters) = match v with IsTypeAliasDeclaration _ -> true | _ -> false
+        let asTypeAliasDeclaration (v: DeclarationWithTypeParameters) = match v with IsTypeAliasDeclaration o -> Some o | _ -> None
+        let (|IsJSDocTemplateTag|_|) (v: DeclarationWithTypeParameters) = if ts.isJSDocTemplateTag (unbox v) then Some (v :> obj :?> JSDocTemplateTag) else None
         let ofJSDocTemplateTag v: DeclarationWithTypeParameters = v |> U5.Case5
-        let isJSDocTemplateTag (v: DeclarationWithTypeParameters) = match v with U5.Case5 _ -> true | _ -> false
-        let asJSDocTemplateTag (v: DeclarationWithTypeParameters) = match v with U5.Case5 o -> Some o | _ -> None
+        let isJSDocTemplateTag (v: DeclarationWithTypeParameters) = match v with IsJSDocTemplateTag _ -> true | _ -> false
+        let asJSDocTemplateTag (v: DeclarationWithTypeParameters) = match v with IsJSDocTemplateTag o -> Some o | _ -> None
+        let (|IsDeclarationWithTypeParameters|_|) v = match unbox v with IsSignatureDeclaration _ | IsClassLikeDeclaration _ | IsInterfaceDeclaration _ | IsTypeAliasDeclaration _ | IsJSDocTemplateTag _ -> Some (v :> obj :?> DeclarationWithTypeParameters) | _ -> None
 
     type [<AllowNullLiteral>] ClassLikeDeclarationBase =
         inherit NamedDeclaration
@@ -2912,12 +3160,15 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module ClassLikeDeclaration =
+        let (|IsClassDeclaration|_|) (v: ClassLikeDeclaration) = if ts.isClassDeclaration (unbox v) then Some (v :> obj :?> ClassDeclaration) else None
         let ofClassDeclaration v: ClassLikeDeclaration = v |> U2.Case1
-        let isClassDeclaration (v: ClassLikeDeclaration) = match v with U2.Case1 _ -> true | _ -> false
-        let asClassDeclaration (v: ClassLikeDeclaration) = match v with U2.Case1 o -> Some o | _ -> None
+        let isClassDeclaration (v: ClassLikeDeclaration) = match v with IsClassDeclaration _ -> true | _ -> false
+        let asClassDeclaration (v: ClassLikeDeclaration) = match v with IsClassDeclaration o -> Some o | _ -> None
+        let (|IsClassExpression|_|) (v: ClassLikeDeclaration) = if ts.isClassExpression (unbox v) then Some (v :> obj :?> ClassExpression) else None
         let ofClassExpression v: ClassLikeDeclaration = v |> U2.Case2
-        let isClassExpression (v: ClassLikeDeclaration) = match v with U2.Case2 _ -> true | _ -> false
-        let asClassExpression (v: ClassLikeDeclaration) = match v with U2.Case2 o -> Some o | _ -> None
+        let isClassExpression (v: ClassLikeDeclaration) = match v with IsClassExpression _ -> true | _ -> false
+        let asClassExpression (v: ClassLikeDeclaration) = match v with IsClassExpression o -> Some o | _ -> None
+        let (|IsClassLikeDeclaration|_|) v = match unbox v with IsClassDeclaration _ | IsClassExpression _ -> Some (v :> obj :?> ClassLikeDeclaration) | _ -> None
 
     type [<AllowNullLiteral>] ClassElement =
         inherit NamedDeclaration
@@ -2974,24 +3225,30 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module ModuleName =
+        let (|IsIdentifier|_|) (v: ModuleName) = if ts.isIdentifier (unbox v) then Some (v :> obj :?> Identifier) else None
         let ofIdentifier v: ModuleName = v |> U2.Case1
-        let isIdentifier (v: ModuleName) = match v with U2.Case1 _ -> true | _ -> false
-        let asIdentifier (v: ModuleName) = match v with U2.Case1 o -> Some o | _ -> None
+        let isIdentifier (v: ModuleName) = match v with IsIdentifier _ -> true | _ -> false
+        let asIdentifier (v: ModuleName) = match v with IsIdentifier o -> Some o | _ -> None
+        let (|IsStringLiteral|_|) (v: ModuleName) = if ts.isStringLiteral (unbox v) then Some (v :> obj :?> StringLiteral) else None
         let ofStringLiteral v: ModuleName = v |> U2.Case2
-        let isStringLiteral (v: ModuleName) = match v with U2.Case2 _ -> true | _ -> false
-        let asStringLiteral (v: ModuleName) = match v with U2.Case2 o -> Some o | _ -> None
+        let isStringLiteral (v: ModuleName) = match v with IsStringLiteral _ -> true | _ -> false
+        let asStringLiteral (v: ModuleName) = match v with IsStringLiteral o -> Some o | _ -> None
+        let (|IsModuleName|_|) v = match unbox v with IsIdentifier _ | IsStringLiteral _ -> Some (v :> obj :?> ModuleName) | _ -> None
 
     type ModuleBody =
         U2<NamespaceBody, JSDocNamespaceBody>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module ModuleBody =
+        let (|IsNamespaceBody|_|) (v: ModuleBody) = match unbox v with NamespaceBody.IsNamespaceBody v -> Some (v :> obj :?> NamespaceBody) | _ -> None
         let ofNamespaceBody v: ModuleBody = v |> U2.Case1
-        let isNamespaceBody (v: ModuleBody) = match v with U2.Case1 _ -> true | _ -> false
-        let asNamespaceBody (v: ModuleBody) = match v with U2.Case1 o -> Some o | _ -> None
+        let isNamespaceBody (v: ModuleBody) = match v with IsNamespaceBody _ -> true | _ -> false
+        let asNamespaceBody (v: ModuleBody) = match v with IsNamespaceBody o -> Some o | _ -> None
+        let (|IsJSDocNamespaceBody|_|) (v: ModuleBody) = match unbox v with JSDocNamespaceBody.IsJSDocNamespaceBody v -> Some (v :> obj :?> JSDocNamespaceBody) | _ -> None
         let ofJSDocNamespaceBody v: ModuleBody = v |> U2.Case2
-        let isJSDocNamespaceBody (v: ModuleBody) = match v with U2.Case2 _ -> true | _ -> false
-        let asJSDocNamespaceBody (v: ModuleBody) = match v with U2.Case2 o -> Some o | _ -> None
+        let isJSDocNamespaceBody (v: ModuleBody) = match v with IsJSDocNamespaceBody _ -> true | _ -> false
+        let asJSDocNamespaceBody (v: ModuleBody) = match v with IsJSDocNamespaceBody o -> Some o | _ -> None
+        let (|IsModuleBody|_|) v = match unbox v with IsNamespaceBody _ | IsJSDocNamespaceBody _ -> Some (v :> obj :?> ModuleBody) | _ -> None
 
     type [<AllowNullLiteral>] ModuleDeclaration =
         inherit DeclarationStatement
@@ -3006,12 +3263,16 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module NamespaceBody =
+        let (|IsModuleBlock|_|) (v: NamespaceBody) = if ts.isModuleBlock (unbox v) then Some (v :> obj :?> ModuleBlock) else None
         let ofModuleBlock v: NamespaceBody = v |> U2.Case1
-        let isModuleBlock (v: NamespaceBody) = match v with U2.Case1 _ -> true | _ -> false
-        let asModuleBlock (v: NamespaceBody) = match v with U2.Case1 o -> Some o | _ -> None
+        let isModuleBlock (v: NamespaceBody) = match v with IsModuleBlock _ -> true | _ -> false
+        let asModuleBlock (v: NamespaceBody) = match v with IsModuleBlock o -> Some o | _ -> None
+        let ts_isNamespaceDeclaration (v: Node) = (not (ts.isJSDoc v) && ts.isModuleDeclaration v)
+        let (|IsNamespaceDeclaration|_|) (v: NamespaceBody) = if ts_isNamespaceDeclaration (unbox v) then Some (v :> obj :?> NamespaceDeclaration) else None
         let ofNamespaceDeclaration v: NamespaceBody = v |> U2.Case2
-        let isNamespaceDeclaration (v: NamespaceBody) = match v with U2.Case2 _ -> true | _ -> false
-        let asNamespaceDeclaration (v: NamespaceBody) = match v with U2.Case2 o -> Some o | _ -> None
+        let isNamespaceDeclaration (v: NamespaceBody) = match v with IsNamespaceDeclaration _ -> true | _ -> false
+        let asNamespaceDeclaration (v: NamespaceBody) = match v with IsNamespaceDeclaration o -> Some o | _ -> None
+        let (|IsNamespaceBody|_|) v = match unbox v with IsModuleBlock _ | IsNamespaceDeclaration _ -> Some (v :> obj :?> NamespaceBody) | _ -> None
 
     type [<AllowNullLiteral>] NamespaceDeclaration =
         inherit ModuleDeclaration
@@ -3023,12 +3284,16 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module JSDocNamespaceBody =
+        let (|IsIdentifier|_|) (v: JSDocNamespaceBody) = if ts.isIdentifier (unbox v) then Some (v :> obj :?> Identifier) else None
         let ofIdentifier v: JSDocNamespaceBody = v |> U2.Case1
-        let isIdentifier (v: JSDocNamespaceBody) = match v with U2.Case1 _ -> true | _ -> false
-        let asIdentifier (v: JSDocNamespaceBody) = match v with U2.Case1 o -> Some o | _ -> None
+        let isIdentifier (v: JSDocNamespaceBody) = match v with IsIdentifier _ -> true | _ -> false
+        let asIdentifier (v: JSDocNamespaceBody) = match v with IsIdentifier o -> Some o | _ -> None
+        let ts_isJSDocNamespaceDeclaration (v: Node) = (ts.isJSDoc v && ts.isModuleDeclaration v)
+        let (|IsJSDocNamespaceDeclaration|_|) (v: JSDocNamespaceBody) = if ts_isJSDocNamespaceDeclaration (unbox v) then Some (v :> obj :?> JSDocNamespaceDeclaration) else None
         let ofJSDocNamespaceDeclaration v: JSDocNamespaceBody = v |> U2.Case2
-        let isJSDocNamespaceDeclaration (v: JSDocNamespaceBody) = match v with U2.Case2 _ -> true | _ -> false
-        let asJSDocNamespaceDeclaration (v: JSDocNamespaceBody) = match v with U2.Case2 o -> Some o | _ -> None
+        let isJSDocNamespaceDeclaration (v: JSDocNamespaceBody) = match v with IsJSDocNamespaceDeclaration _ -> true | _ -> false
+        let asJSDocNamespaceDeclaration (v: JSDocNamespaceBody) = match v with IsJSDocNamespaceDeclaration o -> Some o | _ -> None
+        let (|IsJSDocNamespaceBody|_|) v = match unbox v with IsIdentifier _ | IsJSDocNamespaceDeclaration _ -> Some (v :> obj :?> JSDocNamespaceBody) | _ -> None
 
     type [<AllowNullLiteral>] JSDocNamespaceDeclaration =
         inherit ModuleDeclaration
@@ -3047,12 +3312,15 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module ModuleReference =
+        let (|IsEntityName|_|) (v: ModuleReference) = if ts.isEntityName (unbox v) then Some (v :> obj :?> EntityName) else None
         let ofEntityName v: ModuleReference = v |> U2.Case1
-        let isEntityName (v: ModuleReference) = match v with U2.Case1 _ -> true | _ -> false
-        let asEntityName (v: ModuleReference) = match v with U2.Case1 o -> Some o | _ -> None
+        let isEntityName (v: ModuleReference) = match v with IsEntityName _ -> true | _ -> false
+        let asEntityName (v: ModuleReference) = match v with IsEntityName o -> Some o | _ -> None
+        let (|IsExternalModuleReference|_|) (v: ModuleReference) = if ts.isExternalModuleReference (unbox v) then Some (v :> obj :?> ExternalModuleReference) else None
         let ofExternalModuleReference v: ModuleReference = v |> U2.Case2
-        let isExternalModuleReference (v: ModuleReference) = match v with U2.Case2 _ -> true | _ -> false
-        let asExternalModuleReference (v: ModuleReference) = match v with U2.Case2 o -> Some o | _ -> None
+        let isExternalModuleReference (v: ModuleReference) = match v with IsExternalModuleReference _ -> true | _ -> false
+        let asExternalModuleReference (v: ModuleReference) = match v with IsExternalModuleReference o -> Some o | _ -> None
+        let (|IsModuleReference|_|) v = match unbox v with IsEntityName _ | IsExternalModuleReference _ -> Some (v :> obj :?> ModuleReference) | _ -> None
 
     /// One of:
     /// - import x = require("mod");
@@ -3084,12 +3352,15 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module NamedImportBindings =
+        let (|IsNamespaceImport|_|) (v: NamedImportBindings) = if ts.isNamespaceImport (unbox v) then Some (v :> obj :?> NamespaceImport) else None
         let ofNamespaceImport v: NamedImportBindings = v |> U2.Case1
-        let isNamespaceImport (v: NamedImportBindings) = match v with U2.Case1 _ -> true | _ -> false
-        let asNamespaceImport (v: NamedImportBindings) = match v with U2.Case1 o -> Some o | _ -> None
+        let isNamespaceImport (v: NamedImportBindings) = match v with IsNamespaceImport _ -> true | _ -> false
+        let asNamespaceImport (v: NamedImportBindings) = match v with IsNamespaceImport o -> Some o | _ -> None
+        let (|IsNamedImports|_|) (v: NamedImportBindings) = if ts.isNamedImports (unbox v) then Some (v :> obj :?> NamedImports) else None
         let ofNamedImports v: NamedImportBindings = v |> U2.Case2
-        let isNamedImports (v: NamedImportBindings) = match v with U2.Case2 _ -> true | _ -> false
-        let asNamedImports (v: NamedImportBindings) = match v with U2.Case2 o -> Some o | _ -> None
+        let isNamedImports (v: NamedImportBindings) = match v with IsNamedImports _ -> true | _ -> false
+        let asNamedImports (v: NamedImportBindings) = match v with IsNamedImports o -> Some o | _ -> None
+        let (|IsNamedImportBindings|_|) v = match unbox v with IsNamespaceImport _ | IsNamedImports _ -> Some (v :> obj :?> NamedImportBindings) | _ -> None
 
     type [<AllowNullLiteral>] ImportClause =
         inherit NamedDeclaration
@@ -3134,12 +3405,15 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module NamedImportsOrExports =
+        let (|IsNamedImports|_|) (v: NamedImportsOrExports) = if ts.isNamedImports (unbox v) then Some (v :> obj :?> NamedImports) else None
         let ofNamedImports v: NamedImportsOrExports = v |> U2.Case1
-        let isNamedImports (v: NamedImportsOrExports) = match v with U2.Case1 _ -> true | _ -> false
-        let asNamedImports (v: NamedImportsOrExports) = match v with U2.Case1 o -> Some o | _ -> None
+        let isNamedImports (v: NamedImportsOrExports) = match v with IsNamedImports _ -> true | _ -> false
+        let asNamedImports (v: NamedImportsOrExports) = match v with IsNamedImports o -> Some o | _ -> None
+        let (|IsNamedExports|_|) (v: NamedImportsOrExports) = if ts.isNamedExports (unbox v) then Some (v :> obj :?> NamedExports) else None
         let ofNamedExports v: NamedImportsOrExports = v |> U2.Case2
-        let isNamedExports (v: NamedImportsOrExports) = match v with U2.Case2 _ -> true | _ -> false
-        let asNamedExports (v: NamedImportsOrExports) = match v with U2.Case2 o -> Some o | _ -> None
+        let isNamedExports (v: NamedImportsOrExports) = match v with IsNamedExports _ -> true | _ -> false
+        let asNamedExports (v: NamedImportsOrExports) = match v with IsNamedExports o -> Some o | _ -> None
+        let (|IsNamedImportsOrExports|_|) v = match unbox v with IsNamedImports _ | IsNamedExports _ -> Some (v :> obj :?> NamedImportsOrExports) | _ -> None
 
     type [<AllowNullLiteral>] ImportSpecifier =
         inherit NamedDeclaration
@@ -3160,12 +3434,15 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module ImportOrExportSpecifier =
+        let (|IsImportSpecifier|_|) (v: ImportOrExportSpecifier) = if ts.isImportSpecifier (unbox v) then Some (v :> obj :?> ImportSpecifier) else None
         let ofImportSpecifier v: ImportOrExportSpecifier = v |> U2.Case1
-        let isImportSpecifier (v: ImportOrExportSpecifier) = match v with U2.Case1 _ -> true | _ -> false
-        let asImportSpecifier (v: ImportOrExportSpecifier) = match v with U2.Case1 o -> Some o | _ -> None
+        let isImportSpecifier (v: ImportOrExportSpecifier) = match v with IsImportSpecifier _ -> true | _ -> false
+        let asImportSpecifier (v: ImportOrExportSpecifier) = match v with IsImportSpecifier o -> Some o | _ -> None
+        let (|IsExportSpecifier|_|) (v: ImportOrExportSpecifier) = if ts.isExportSpecifier (unbox v) then Some (v :> obj :?> ExportSpecifier) else None
         let ofExportSpecifier v: ImportOrExportSpecifier = v |> U2.Case2
-        let isExportSpecifier (v: ImportOrExportSpecifier) = match v with U2.Case2 _ -> true | _ -> false
-        let asExportSpecifier (v: ImportOrExportSpecifier) = match v with U2.Case2 o -> Some o | _ -> None
+        let isExportSpecifier (v: ImportOrExportSpecifier) = match v with IsExportSpecifier _ -> true | _ -> false
+        let asExportSpecifier (v: ImportOrExportSpecifier) = match v with IsExportSpecifier o -> Some o | _ -> None
+        let (|IsImportOrExportSpecifier|_|) v = match unbox v with IsImportSpecifier _ | IsExportSpecifier _ -> Some (v :> obj :?> ImportOrExportSpecifier) | _ -> None
 
     type [<AllowNullLiteral>] ExportAssignment =
         inherit DeclarationStatement
@@ -3243,18 +3520,23 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module JSDocTypeReferencingNode =
+        let (|IsJSDocVariadicType|_|) (v: JSDocTypeReferencingNode) = if ts.isJSDocVariadicType (unbox v) then Some (v :> obj :?> JSDocVariadicType) else None
         let ofJSDocVariadicType v: JSDocTypeReferencingNode = v |> U4.Case1
-        let isJSDocVariadicType (v: JSDocTypeReferencingNode) = match v with U4.Case1 _ -> true | _ -> false
-        let asJSDocVariadicType (v: JSDocTypeReferencingNode) = match v with U4.Case1 o -> Some o | _ -> None
+        let isJSDocVariadicType (v: JSDocTypeReferencingNode) = match v with IsJSDocVariadicType _ -> true | _ -> false
+        let asJSDocVariadicType (v: JSDocTypeReferencingNode) = match v with IsJSDocVariadicType o -> Some o | _ -> None
+        let (|IsJSDocOptionalType|_|) (v: JSDocTypeReferencingNode) = if ts.isJSDocOptionalType (unbox v) then Some (v :> obj :?> JSDocOptionalType) else None
         let ofJSDocOptionalType v: JSDocTypeReferencingNode = v |> U4.Case2
-        let isJSDocOptionalType (v: JSDocTypeReferencingNode) = match v with U4.Case2 _ -> true | _ -> false
-        let asJSDocOptionalType (v: JSDocTypeReferencingNode) = match v with U4.Case2 o -> Some o | _ -> None
+        let isJSDocOptionalType (v: JSDocTypeReferencingNode) = match v with IsJSDocOptionalType _ -> true | _ -> false
+        let asJSDocOptionalType (v: JSDocTypeReferencingNode) = match v with IsJSDocOptionalType o -> Some o | _ -> None
+        let (|IsJSDocNullableType|_|) (v: JSDocTypeReferencingNode) = if ts.isJSDocNullableType (unbox v) then Some (v :> obj :?> JSDocNullableType) else None
         let ofJSDocNullableType v: JSDocTypeReferencingNode = v |> U4.Case3
-        let isJSDocNullableType (v: JSDocTypeReferencingNode) = match v with U4.Case3 _ -> true | _ -> false
-        let asJSDocNullableType (v: JSDocTypeReferencingNode) = match v with U4.Case3 o -> Some o | _ -> None
+        let isJSDocNullableType (v: JSDocTypeReferencingNode) = match v with IsJSDocNullableType _ -> true | _ -> false
+        let asJSDocNullableType (v: JSDocTypeReferencingNode) = match v with IsJSDocNullableType o -> Some o | _ -> None
+        let (|IsJSDocNonNullableType|_|) (v: JSDocTypeReferencingNode) = if ts.isJSDocNonNullableType (unbox v) then Some (v :> obj :?> JSDocNonNullableType) else None
         let ofJSDocNonNullableType v: JSDocTypeReferencingNode = v |> U4.Case4
-        let isJSDocNonNullableType (v: JSDocTypeReferencingNode) = match v with U4.Case4 _ -> true | _ -> false
-        let asJSDocNonNullableType (v: JSDocTypeReferencingNode) = match v with U4.Case4 o -> Some o | _ -> None
+        let isJSDocNonNullableType (v: JSDocTypeReferencingNode) = match v with IsJSDocNonNullableType _ -> true | _ -> false
+        let asJSDocNonNullableType (v: JSDocTypeReferencingNode) = match v with IsJSDocNonNullableType o -> Some o | _ -> None
+        let (|IsJSDocTypeReferencingNode|_|) v = match unbox v with IsJSDocVariadicType _ | IsJSDocOptionalType _ | IsJSDocNullableType _ | IsJSDocNonNullableType _ -> Some (v :> obj :?> JSDocTypeReferencingNode) | _ -> None
 
     type [<AllowNullLiteral>] JSDoc =
         inherit Node
@@ -3369,30 +3651,47 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module FlowNode =
+        let ts_isAfterFinallyFlow (v: FlowNodeBase) = (v.flags = FlowFlags.AfterFinally)
+        let (|IsAfterFinallyFlow|_|) (v: FlowNode) = if ts_isAfterFinallyFlow (unbox v) then Some (v :> obj :?> AfterFinallyFlow) else None
         let ofAfterFinallyFlow v: FlowNode = v |> U8.Case1
-        let isAfterFinallyFlow (v: FlowNode) = match v with U8.Case1 _ -> true | _ -> false
-        let asAfterFinallyFlow (v: FlowNode) = match v with U8.Case1 o -> Some o | _ -> None
+        let isAfterFinallyFlow (v: FlowNode) = match v with IsAfterFinallyFlow _ -> true | _ -> false
+        let asAfterFinallyFlow (v: FlowNode) = match v with IsAfterFinallyFlow o -> Some o | _ -> None
+        let ts_isPreFinallyFlow (v: FlowNodeBase) = (v.flags = FlowFlags.PreFinally)
+        let (|IsPreFinallyFlow|_|) (v: FlowNode) = if ts_isPreFinallyFlow (unbox v) then Some (v :> obj :?> PreFinallyFlow) else None
         let ofPreFinallyFlow v: FlowNode = v |> U8.Case2
-        let isPreFinallyFlow (v: FlowNode) = match v with U8.Case2 _ -> true | _ -> false
-        let asPreFinallyFlow (v: FlowNode) = match v with U8.Case2 o -> Some o | _ -> None
+        let isPreFinallyFlow (v: FlowNode) = match v with IsPreFinallyFlow _ -> true | _ -> false
+        let asPreFinallyFlow (v: FlowNode) = match v with IsPreFinallyFlow o -> Some o | _ -> None
+        let ts_isFlowStart (v: FlowNodeBase) = (v.flags = FlowFlags.Start)
+        let (|IsFlowStart|_|) (v: FlowNode) = if ts_isFlowStart (unbox v) then Some (v :> obj :?> FlowStart) else None
         let ofFlowStart v: FlowNode = v |> U8.Case3
-        let isFlowStart (v: FlowNode) = match v with U8.Case3 _ -> true | _ -> false
-        let asFlowStart (v: FlowNode) = match v with U8.Case3 o -> Some o | _ -> None
+        let isFlowStart (v: FlowNode) = match v with IsFlowStart _ -> true | _ -> false
+        let asFlowStart (v: FlowNode) = match v with IsFlowStart o -> Some o | _ -> None
+        let ts_isFlowLabel (v: FlowNodeBase) = (v.flags = FlowFlags.Label)
+        let (|IsFlowLabel|_|) (v: FlowNode) = if ts_isFlowLabel (unbox v) then Some (v :> obj :?> FlowLabel) else None
         let ofFlowLabel v: FlowNode = v |> U8.Case4
-        let isFlowLabel (v: FlowNode) = match v with U8.Case4 _ -> true | _ -> false
-        let asFlowLabel (v: FlowNode) = match v with U8.Case4 o -> Some o | _ -> None
+        let isFlowLabel (v: FlowNode) = match v with IsFlowLabel _ -> true | _ -> false
+        let asFlowLabel (v: FlowNode) = match v with IsFlowLabel o -> Some o | _ -> None
+        let ts_isFlowAssignment (v: FlowNodeBase) = (v.flags = FlowFlags.Assignment)
+        let (|IsFlowAssignment|_|) (v: FlowNode) = if ts_isFlowAssignment (unbox v) then Some (v :> obj :?> FlowAssignment) else None
         let ofFlowAssignment v: FlowNode = v |> U8.Case5
-        let isFlowAssignment (v: FlowNode) = match v with U8.Case5 _ -> true | _ -> false
-        let asFlowAssignment (v: FlowNode) = match v with U8.Case5 o -> Some o | _ -> None
+        let isFlowAssignment (v: FlowNode) = match v with IsFlowAssignment _ -> true | _ -> false
+        let asFlowAssignment (v: FlowNode) = match v with IsFlowAssignment o -> Some o | _ -> None
+        let ts_isFlowCondition (v: FlowNodeBase) = (v.flags = FlowFlags.Condition)
+        let (|IsFlowCondition|_|) (v: FlowNode) = if ts_isFlowCondition (unbox v) then Some (v :> obj :?> FlowCondition) else None
         let ofFlowCondition v: FlowNode = v |> U8.Case6
-        let isFlowCondition (v: FlowNode) = match v with U8.Case6 _ -> true | _ -> false
-        let asFlowCondition (v: FlowNode) = match v with U8.Case6 o -> Some o | _ -> None
+        let isFlowCondition (v: FlowNode) = match v with IsFlowCondition _ -> true | _ -> false
+        let asFlowCondition (v: FlowNode) = match v with IsFlowCondition o -> Some o | _ -> None
+        let ts_isFlowSwitchClause (v: FlowNodeBase) = (v.flags = FlowFlags.SwitchClause)
+        let (|IsFlowSwitchClause|_|) (v: FlowNode) = if ts_isFlowSwitchClause (unbox v) then Some (v :> obj :?> FlowSwitchClause) else None
         let ofFlowSwitchClause v: FlowNode = v |> U8.Case7
-        let isFlowSwitchClause (v: FlowNode) = match v with U8.Case7 _ -> true | _ -> false
-        let asFlowSwitchClause (v: FlowNode) = match v with U8.Case7 o -> Some o | _ -> None
+        let isFlowSwitchClause (v: FlowNode) = match v with IsFlowSwitchClause _ -> true | _ -> false
+        let asFlowSwitchClause (v: FlowNode) = match v with IsFlowSwitchClause o -> Some o | _ -> None
+        let ts_isFlowArrayMutation (v: FlowNodeBase) = (v.flags = FlowFlags.ArrayMutation)
+        let (|IsFlowArrayMutation|_|) (v: FlowNode) = if ts_isFlowArrayMutation (unbox v) then Some (v :> obj :?> FlowArrayMutation) else None
         let ofFlowArrayMutation v: FlowNode = v |> U8.Case8
-        let isFlowArrayMutation (v: FlowNode) = match v with U8.Case8 _ -> true | _ -> false
-        let asFlowArrayMutation (v: FlowNode) = match v with U8.Case8 o -> Some o | _ -> None
+        let isFlowArrayMutation (v: FlowNode) = match v with IsFlowArrayMutation _ -> true | _ -> false
+        let asFlowArrayMutation (v: FlowNode) = match v with IsFlowArrayMutation o -> Some o | _ -> None
+        let (|IsFlowNode|_|) v = match unbox v with IsAfterFinallyFlow _ | IsPreFinallyFlow _ | IsFlowStart _ | IsFlowLabel _ | IsFlowAssignment _ | IsFlowCondition _ | IsFlowSwitchClause _ | IsFlowArrayMutation _ -> Some (v :> obj :?> FlowNode) | _ -> None
 
     type [<AllowNullLiteral>] FlowNodeBase =
         abstract flags: FlowFlags with get, set
@@ -3433,12 +3732,17 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module FlowType =
+        let ts_isType (v: IncompleteType) = (int v.flags <> 0)
+        let (|IsType|_|) (v: FlowType) = if ts_isType (unbox v) then Some (v :> obj :?> Type) else None
         let ofType v: FlowType = v |> U2.Case1
-        let isType (v: FlowType) = match v with U2.Case1 _ -> true | _ -> false
-        let asType (v: FlowType) = match v with U2.Case1 o -> Some o | _ -> None
+        let isType (v: FlowType) = match v with IsType _ -> true | _ -> false
+        let asType (v: FlowType) = match v with IsType o -> Some o | _ -> None
+        let ts_isIncompleteType (v: IncompleteType) = (int v.flags = 0)
+        let (|IsIncompleteType|_|) (v: FlowType) = if ts_isIncompleteType (unbox v) then Some (v :> obj :?> IncompleteType) else None
         let ofIncompleteType v: FlowType = v |> U2.Case2
-        let isIncompleteType (v: FlowType) = match v with U2.Case2 _ -> true | _ -> false
-        let asIncompleteType (v: FlowType) = match v with U2.Case2 o -> Some o | _ -> None
+        let isIncompleteType (v: FlowType) = match v with IsIncompleteType _ -> true | _ -> false
+        let asIncompleteType (v: FlowType) = match v with IsIncompleteType o -> Some o | _ -> None
+        let (|IsFlowType|_|) v = match unbox v with IsType _ | IsIncompleteType _ -> Some (v :> obj :?> FlowType) | _ -> None
 
     type [<AllowNullLiteral>] IncompleteType =
         abstract flags: TypeFlags with get, set
@@ -3737,12 +4041,17 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module TypePredicate =
+        let ts_isIdentifierTypePredicate (v: TypePredicateBase) = (v.kind = TypePredicateKind.Identifier)
+        let (|IsIdentifierTypePredicate|_|) (v: TypePredicate) = if ts_isIdentifierTypePredicate (unbox v) then Some (v :> obj :?> IdentifierTypePredicate) else None
         let ofIdentifierTypePredicate v: TypePredicate = v |> U2.Case1
-        let isIdentifierTypePredicate (v: TypePredicate) = match v with U2.Case1 _ -> true | _ -> false
-        let asIdentifierTypePredicate (v: TypePredicate) = match v with U2.Case1 o -> Some o | _ -> None
+        let isIdentifierTypePredicate (v: TypePredicate) = match v with IsIdentifierTypePredicate _ -> true | _ -> false
+        let asIdentifierTypePredicate (v: TypePredicate) = match v with IsIdentifierTypePredicate o -> Some o | _ -> None
+        let ts_isThisTypePredicate (v: TypePredicateBase) = (v.kind = TypePredicateKind.This)
+        let (|IsThisTypePredicate|_|) (v: TypePredicate) = if ts_isThisTypePredicate (unbox v) then Some (v :> obj :?> ThisTypePredicate) else None
         let ofThisTypePredicate v: TypePredicate = v |> U2.Case2
-        let isThisTypePredicate (v: TypePredicate) = match v with U2.Case2 _ -> true | _ -> false
-        let asThisTypePredicate (v: TypePredicate) = match v with U2.Case2 o -> Some o | _ -> None
+        let isThisTypePredicate (v: TypePredicate) = match v with IsThisTypePredicate _ -> true | _ -> false
+        let asThisTypePredicate (v: TypePredicate) = match v with IsThisTypePredicate o -> Some o | _ -> None
+        let (|IsTypePredicate|_|) v = match unbox v with IsIdentifierTypePredicate _ | IsThisTypePredicate _ -> Some (v :> obj :?> TypePredicate) | _ -> None
 
     type [<RequireQualifiedAccess>] SymbolFlags =
         | None = 0
@@ -3837,19 +4146,42 @@ module Ts =
         | [<CompiledName "__computed">] Computed
         | [<CompiledName "__resolving__">] Resolving
         | [<CompiledName "export=">] ExportEquals
-        | Default
+        | [<CompiledName "default">] Default
+        | [<CompiledName "this">] This
 
     type __String =
-        U2<obj, InternalSymbolName>
+        U2<String, InternalSymbolName>
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module __String =
-        let ofObj v: __String = v |> U2.Case1
-        let isObj (v: __String) = match v with U2.Case1 _ -> true | _ -> false
-        let asObj (v: __String) = match v with U2.Case1 o -> Some o | _ -> None
+        let ts_isString (v: __String) = (not (isInternalSymbolName v))
+        let (|IsString|_|) (v: __String) = if ts_isString (unbox v) then Some (v :> obj :?> String) else None
+        let ofString v: __String = v |> U2.Case1
+        let isString (v: __String) = match v with IsString _ -> true | _ -> false
+        let asString (v: __String) = match v with IsString o -> Some o | _ -> None
+        let (|IsCall|_|) (v: string) = if v = (string InternalSymbolName.Call) then Some (v :> obj :?> InternalSymbolName) else None
+        let (|IsConstructor|_|) (v: string) = if v = (string InternalSymbolName.Constructor) then Some (v :> obj :?> InternalSymbolName) else None
+        let (|IsNew|_|) (v: string) = if v = (string InternalSymbolName.New) then Some (v :> obj :?> InternalSymbolName) else None
+        let (|IsIndex|_|) (v: string) = if v = (string InternalSymbolName.Index) then Some (v :> obj :?> InternalSymbolName) else None
+        let (|IsExportStar|_|) (v: string) = if v = (string InternalSymbolName.ExportStar) then Some (v :> obj :?> InternalSymbolName) else None
+        let (|IsGlobal|_|) (v: string) = if v = (string InternalSymbolName.Global) then Some (v :> obj :?> InternalSymbolName) else None
+        let (|IsMissing|_|) (v: string) = if v = (string InternalSymbolName.Missing) then Some (v :> obj :?> InternalSymbolName) else None
+        let (|IsType|_|) (v: string) = if v = (string InternalSymbolName.Type) then Some (v :> obj :?> InternalSymbolName) else None
+        let (|IsObject|_|) (v: string) = if v = (string InternalSymbolName.Object) then Some (v :> obj :?> InternalSymbolName) else None
+        let (|IsJSXAttributes|_|) (v: string) = if v = (string InternalSymbolName.JSXAttributes) then Some (v :> obj :?> InternalSymbolName) else None
+        let (|IsClass|_|) (v: string) = if v = (string InternalSymbolName.Class) then Some (v :> obj :?> InternalSymbolName) else None
+        let (|IsFunction|_|) (v: string) = if v = (string InternalSymbolName.Function) then Some (v :> obj :?> InternalSymbolName) else None
+        let (|IsComputed|_|) (v: string) = if v = (string InternalSymbolName.Computed) then Some (v :> obj :?> InternalSymbolName) else None
+        let (|IsResolving|_|) (v: string) = if v = (string InternalSymbolName.Resolving) then Some (v :> obj :?> InternalSymbolName) else None
+        let (|IsExportEquals|_|) (v: string) = if v = (string InternalSymbolName.ExportEquals) then Some (v :> obj :?> InternalSymbolName) else None
+        let (|IsDefault|_|) (v: string) = if v = (string InternalSymbolName.Default) then Some (v :> obj :?> InternalSymbolName) else None
+        let (|IsThis|_|) (v: string) = if v = (string InternalSymbolName.This) then Some (v :> obj :?> InternalSymbolName) else None
+        let IsInternalSymbolName (v: string) = match v with IsCall _ | IsConstructor _ | IsNew _ | IsIndex _ | IsExportStar _ | IsGlobal _ | IsMissing _ | IsType _ | IsObject _ | IsJSXAttributes _ | IsClass _ | IsFunction _ | IsComputed _ | IsResolving _ | IsExportEquals _ | IsDefault _ | IsThis _ -> Some (v :> obj :?> InternalSymbolName) | _ -> None
+        let (|IsInternalSymbolName|_|) (v: __String) = if isInternalSymbolName (unbox v) then Some (v :> obj :?> InternalSymbolName) else None
         let ofInternalSymbolName v: __String = v |> U2.Case2
-        let isInternalSymbolName (v: __String) = match v with U2.Case2 _ -> true | _ -> false
-        let asInternalSymbolName (v: __String) = match v with U2.Case2 o -> Some o | _ -> None
+        let isInternalSymbolName (v: __String) = match v with IsInternalSymbolName _ -> true | _ -> false
+        let asInternalSymbolName (v: __String) = match v with IsInternalSymbolName o -> Some o | _ -> None
+        let (|Is__String|_|) v = match unbox v with IsString _ | IsInternalSymbolName _ -> Some (v :> obj :?> __String) | _ -> None
 
     /// ReadonlyMap where keys are `__String`s. 
     type [<AllowNullLiteral>] ReadonlyUnderscoreEscapedMap<'T> =
@@ -3914,15 +4246,19 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module DestructuringPattern =
+        let (|IsBindingPattern|_|) (v: DestructuringPattern) = match unbox v with BindingPattern.IsBindingPattern v -> Some (v :> obj :?> BindingPattern) | _ -> None
         let ofBindingPattern v: DestructuringPattern = v |> U3.Case1
-        let isBindingPattern (v: DestructuringPattern) = match v with U3.Case1 _ -> true | _ -> false
-        let asBindingPattern (v: DestructuringPattern) = match v with U3.Case1 o -> Some o | _ -> None
+        let isBindingPattern (v: DestructuringPattern) = match v with IsBindingPattern _ -> true | _ -> false
+        let asBindingPattern (v: DestructuringPattern) = match v with IsBindingPattern o -> Some o | _ -> None
+        let (|IsObjectLiteralExpression|_|) (v: DestructuringPattern) = if ts.isObjectLiteralExpression (unbox v) then Some (v :> obj :?> ObjectLiteralExpression) else None
         let ofObjectLiteralExpression v: DestructuringPattern = v |> U3.Case2
-        let isObjectLiteralExpression (v: DestructuringPattern) = match v with U3.Case2 _ -> true | _ -> false
-        let asObjectLiteralExpression (v: DestructuringPattern) = match v with U3.Case2 o -> Some o | _ -> None
+        let isObjectLiteralExpression (v: DestructuringPattern) = match v with IsObjectLiteralExpression _ -> true | _ -> false
+        let asObjectLiteralExpression (v: DestructuringPattern) = match v with IsObjectLiteralExpression o -> Some o | _ -> None
+        let (|IsArrayLiteralExpression|_|) (v: DestructuringPattern) = if ts.isArrayLiteralExpression (unbox v) then Some (v :> obj :?> ArrayLiteralExpression) else None
         let ofArrayLiteralExpression v: DestructuringPattern = v |> U3.Case3
-        let isArrayLiteralExpression (v: DestructuringPattern) = match v with U3.Case3 _ -> true | _ -> false
-        let asArrayLiteralExpression (v: DestructuringPattern) = match v with U3.Case3 o -> Some o | _ -> None
+        let isArrayLiteralExpression (v: DestructuringPattern) = match v with IsArrayLiteralExpression _ -> true | _ -> false
+        let asArrayLiteralExpression (v: DestructuringPattern) = match v with IsArrayLiteralExpression o -> Some o | _ -> None
+        let (|IsDestructuringPattern|_|) v = match unbox v with IsBindingPattern _ | IsObjectLiteralExpression _ | IsArrayLiteralExpression _ -> Some (v :> obj :?> DestructuringPattern) | _ -> None
 
     type [<AllowNullLiteral>] Type =
         abstract flags: TypeFlags with get, set
@@ -3989,12 +4325,16 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module BaseType =
+        let ts_isObjectType (v: BaseType) = (not (isIntersectionType v))
+        let (|IsObjectType|_|) (v: BaseType) = if ts_isObjectType (unbox v) then Some (v :> obj :?> ObjectType) else None
         let ofObjectType v: BaseType = v |> U2.Case1
-        let isObjectType (v: BaseType) = match v with U2.Case1 _ -> true | _ -> false
-        let asObjectType (v: BaseType) = match v with U2.Case1 o -> Some o | _ -> None
+        let isObjectType (v: BaseType) = match v with IsObjectType _ -> true | _ -> false
+        let asObjectType (v: BaseType) = match v with IsObjectType o -> Some o | _ -> None
+        let (|IsIntersectionType|_|) (v: BaseType) = match unbox v with UnionOrIntersectionType.IsIntersectionType v -> Some (v :> obj :?> BindingOrAssignmentPattern) | _ -> None
         let ofIntersectionType v: BaseType = v |> U2.Case2
-        let isIntersectionType (v: BaseType) = match v with U2.Case2 _ -> true | _ -> false
-        let asIntersectionType (v: BaseType) = match v with U2.Case2 o -> Some o | _ -> None
+        let isIntersectionType (v: BaseType) = match v with IsIntersectionType _ -> true | _ -> false
+        let asIntersectionType (v: BaseType) = match v with IsIntersectionType o -> Some o | _ -> None
+        let (|IsBaseType|_|) v = match unbox v with IsObjectType _ | IsIntersectionType _ -> Some (v :> obj :?> BaseType) | _ -> None
 
     type [<AllowNullLiteral>] InterfaceTypeWithDeclaredMembers =
         inherit InterfaceType
@@ -4025,6 +4365,12 @@ module Ts =
         inherit Type
         abstract types: ResizeArray<Type> with get, set
 
+    [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+    module UnionOrIntersectionType =
+        let (|IsUnionType|_|) (v: UnionOrIntersectionType) = if ts.isUnionTypeNode (unbox v) then Some (v :> obj :?> UnionType) else None
+        let (|IsIntersectionType|_|) (v: UnionOrIntersectionType) = if ts.isIntersectionTypeNode (unbox v) then Some (v :> obj :?> IntersectionType) else None
+        let (|IsUnionOrIntersectionType|_|) v = match unbox v with IsUnionType _ | IsIntersectionType _ -> Some (v :> obj :?> StructuredType) | _ -> None
+
     type [<AllowNullLiteral>] UnionType =
         inherit UnionOrIntersectionType
 
@@ -4036,15 +4382,20 @@ module Ts =
 
     [<RequireQualifiedAccess; CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module StructuredType =
+        let ts_isObjectType (v: StructuredType) = (not (isIntersectionType v) && not (isUnionType v))
+        let (|IsObjectType|_|) (v: StructuredType) = if ts_isObjectType (unbox v) then Some (v :> obj :?> ObjectType) else None
         let ofObjectType v: StructuredType = v |> U3.Case1
-        let isObjectType (v: StructuredType) = match v with U3.Case1 _ -> true | _ -> false
-        let asObjectType (v: StructuredType) = match v with U3.Case1 o -> Some o | _ -> None
+        let isObjectType (v: StructuredType) = match v with IsObjectType _ -> true | _ -> false
+        let asObjectType (v: StructuredType) = match v with IsObjectType o -> Some o | _ -> None
+        let (|IsUnionType|_|) (v: StructuredType) = if ts.isUnionTypeNode (unbox v) then Some (v :> obj :?> UnionType) else None
         let ofUnionType v: StructuredType = v |> U3.Case2
-        let isUnionType (v: StructuredType) = match v with U3.Case2 _ -> true | _ -> false
-        let asUnionType (v: StructuredType) = match v with U3.Case2 o -> Some o | _ -> None
+        let isUnionType (v: StructuredType) = match v with IsUnionType _ -> true | _ -> false
+        let asUnionType (v: StructuredType) = match v with IsUnionType o -> Some o | _ -> None
+        let (|IsIntersectionType|_|) (v: StructuredType) = if ts.isIntersectionTypeNode (unbox v) then Some (v :> obj :?> IntersectionType) else None
         let ofIntersectionType v: StructuredType = v |> U3.Case3
-        let isIntersectionType (v: StructuredType) = match v with U3.Case3 _ -> true | _ -> false
-        let asIntersectionType (v: StructuredType) = match v with U3.Case3 o -> Some o | _ -> None
+        let isIntersectionType (v: StructuredType) = match v with IsIntersectionType _ -> true | _ -> false
+        let asIntersectionType (v: StructuredType) = match v with IsIntersectionType o -> Some o | _ -> None
+        let (|IsStructuredType|_|) v = match unbox v with IsObjectType _ | IsUnionType _ | IsIntersectionType _ -> Some (v :> obj :?> StructuredType) | _ -> None
 
     type [<AllowNullLiteral>] EvolvingArrayType =
         inherit ObjectType
