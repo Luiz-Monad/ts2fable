@@ -6,11 +6,11 @@ group WebApp
     Fable.Elmish.Browser
     Fable.Elmish.Debugger
     Fable.Elmish.HMR
-    Fable.PowerPack
+    Fable.FontAwesome.Free
+    Fable.Promise
     Fable.React
     Fulma
     Fulma.Extensions
+    Fulma.Extensions.Wikiki.PageLoader
 
     File: Monaco.fs
-
-    dotnet-fable

@@ -1,22 +1,14 @@
 module ts2fable.node.Version
 
-open Node
-open Fable.Core.JsInterop
+open Node.Api
+open Fable.Core
 
-let inline private ofJson<'T> (a: string) : 'T =
-    let decoder = Thoth.Json.Decode.Auto.generateDecoder<'T>()
-    match Thoth.Json.Decode.fromString decoder a with
-    | Ok o -> o
-    | Error e -> failwith e
+[<Emit "require($0).version">]
+let getVersion (path: string): string = jsNative
 
-type PackageJson =
-    {
-        version: string
-    }
 let version =
-    let packageJsonPath = path.join(ResizeArray([__dirname; "../package.json"]))
-    if fs.existsSync !^packageJsonPath then
-        let packageJson = fs.readFileSync(!^(!^packageJsonPath), !^"utf8") |> ofJson<PackageJson>
-        packageJson.version
+    let packageJsonPath = path.join [| __dirname; "../package.json" |]
+    if fs.existsSync (packageJsonPath |> U2.Case1) then
+        getVersion packageJsonPath
     else
         "0.0.0"

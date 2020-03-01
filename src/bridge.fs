@@ -28,9 +28,9 @@ type internal NodeBridge =
 [<RequireQualifiedAccess>]
 module internal NodeBridge =
     let useExport nb f =
-        match nb.TsPaths with 
+        match nb.TsPaths with
         | [tsPath] -> f tsPath
-        | _ -> failwith "tspaths 's length must be 1 when with --exports option" 
+        | _ -> failwith "tspaths 's length must be 1 when with --exports option"
 
 type internal WebBridge =
     {
@@ -48,7 +48,7 @@ module internal Bridge =
 
     let private fsFileKind tsPath =
         function
-        | Bridge.Node nb -> 
+        | Bridge.Node nb ->
             nb.GetFsFileKind (nb,tsPath)
         | Bridge.Web w -> FsFileKind.Index
 
@@ -59,22 +59,22 @@ module internal Bridge =
 
     let private getExportFiles =
         function
-        | Bridge.Node nb -> 
-            if nb.Exports.Length = 0 then nb.TsPaths 
+        | Bridge.Node nb ->
+            if nb.Exports.Length = 0 then nb.TsPaths
             else
                 NodeBridge.useExport nb (fun index ->
                     let tsPathsInExports (exports:string list) =
                         nb.EnumerateFilesInSameDir index |> List.ofSeq |> List.filter (fun f ->
-                            f.EndsWith(".d.ts") && stringContainsAny f exports 
-                        ) 
+                            f.EndsWith(".d.ts") && stringContainsAny f exports
+                        )
                     tsPathsInExports nb.Exports
-                )                
+                )
         | Bridge.Web w -> [w.FileName]
 
     let private getNamespace =
         function
         | Bridge.Node nb -> nb.NameSpace
-        | Bridge.Web _ -> "moduleName" 
+        | Bridge.Web _ -> "moduleName"
 
     let private createProgram bridge =
         let createDummy tsPaths (sourceFiles: SourceFile list) =
@@ -93,27 +93,25 @@ module internal Bridge =
                 o.fileExists <- fun fileName -> List.contains fileName tsPaths
                 o.readFile <- fun _ -> Some ""
                 o.directoryExists <- fun _ -> true
-                o.getDirectories <- fun _ -> ResizeArray [] 
+                o.getDirectories <- fun _ -> ResizeArray []
             )
-            ts.createProgram(ResizeArray tsPaths, options, host)    
+            ts.createProgram(ResizeArray tsPaths, options, host)
         match bridge with
-        | Bridge.Node nb -> 
+        | Bridge.Node nb ->
             let exports,readText = getExportFiles bridge,nb.ReadText
-            let sourceFiles = 
+            let sourceFiles =
                 exports |> List.map (fun tsPath ->
                     let text = tsPath |> readText
                     ts.createSourceFile (tsPath, text, scriptTarget, true)
                 )
             createDummy exports sourceFiles
-
-        | Bridge.Web w -> 
+        | Bridge.Web w ->
             createDummy [w.FileName] [w.SourceFile]
 
     let private fixNameSpaceWithBridge bridge file =
-        match bridge with 
+        match bridge with
         | Bridge.Node nb -> nb.FixNamespace file
         | Bridge.Web _ -> fixNamespace file
-
 
 
     // This app has 3 main functions.
@@ -149,21 +147,21 @@ module internal Bridge =
         |> removeDuplicateFunctions
         |> removeDuplicateOptions
         |> extractTypeLiterals // after fixEscapeWords
-        |> addAliasUnionHelpers
+        // |> addAliasUnionHelpers // disabled for Fable.Core 3.x
         |> removeDuplicateOptionsFromParameters
         |> fixFloatAlias
 
-    let getFsFileOut bridge = 
+    let getFsFileOut bridge =
         let program = createProgram bridge
         let nameSpace = getNamespace bridge
         let exportFiles = getExportFiles bridge
-        
+
         for export in exportFiles do
             printfn "export %s" export
 
         let tsFiles = exportFiles |> List.map program.getSourceFile |> List.choose id
         let checker = program.getTypeChecker()
-        
+
         let moduleNameMap =
             program.getSourceFiles()
             |> Seq.map (fun sf -> sf.fileName, getJsModuleName sf.fileName)
@@ -179,7 +177,7 @@ module internal Bridge =
             |> readSourceFile checker tsFile
             |> transform bridge
         )
-        
+
         {
             // use the F# file name as the module namespace
             // TODO ensure valid name
@@ -188,9 +186,10 @@ module internal Bridge =
                 [
                     "System"
                     "Fable.Core"
-                    "Fable.Import.JS"
+                    "Fable.Core.JS"
                 ]
             Files = fsFiles
+            AbbrevTypes = []
         }
         |> fixFsFileOut
 

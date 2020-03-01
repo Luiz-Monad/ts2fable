@@ -1,6 +1,2 @@
-group netcorebuild
-    dotnet-fable
-group source
-    Fable.Core
-    Fable.Import.Browser
-    Thoth.Json
+Fable.Core
+Fable.Node

@@ -2,17 +2,21 @@
 module rec variableInModule
 open System
 open Fable.Core
-open Fable.Import.JS
+open Fable.Core.JS
 
 let [<Import("*","test")>] monaco: Monaco.IExports = jsNative
 
 module Monaco =
 
     type [<AllowNullLiteral>] IExports =
-        abstract EditorType: obj
+        abstract EditorType: IExportsEditorType
 
     type [<AllowNullLiteral>] IDisposable =
         abstract dispose: unit -> unit
 
     type [<AllowNullLiteral>] IEvent<'T> =
-        [<Emit "$0($1...)">] abstract Invoke: listener: ('T -> obj option) * ?thisArg: obj option -> IDisposable
+        [<Emit "$0($1...)">] abstract Invoke: listener: ('T -> obj option) * ?thisArg: obj -> IDisposable
+
+    type [<AllowNullLiteral>] IExportsEditorType =
+        abstract ICodeEditor: string with get, set
+        abstract IDiffEditor: string with get, set
