@@ -9,4 +9,3 @@ group netcorebuild
     Fake.Windows.Chocolatey
     Fake.Core.Target
     Fake.JavaScript.Yarn
-    dotnet-fake

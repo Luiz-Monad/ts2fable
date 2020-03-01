@@ -1,21 +1,23 @@
 source https://api.nuget.org/v3/index.json
 storage none
+framework: netcoreapp3.1
 
 group source
     source https://api.nuget.org/v3/index.json
     storage:none
+    framework: netcoreapp3.1
     
     nuget Fsharp.Core
-    nuget Fable.Core ~> 2
+    nuget Fable.Core
     nuget Fable.Import.Browser
     nuget Thoth.Json
 
 group netcorebuild
     source https://api.nuget.org/v3/index.json
     storage:none
-    framework: netstandard2.0
+    framework: netcoreapp3.1
 
-    nuget Fsharp.Core ~> 4.6.0
+    nuget Fsharp.Core
     nuget Fake.DotNet.Cli
     nuget Fake.IO.FileSystem
     nuget Fake.Core.Environment
@@ -26,14 +28,14 @@ group netcorebuild
     nuget Fake.Core.Target
     nuget Fake.JavaScript.Yarn
 
-    clitool dotnet-fake
     clitool dotnet-fable
 
 group WebApp
     source https://api.nuget.org/v3/index.json
     storage:none
+    framework: netcoreapp3.1
 
-    nuget FSharp.Core redirects:force
+    nuget FSharp.Core
     nuget Fable.Core
     nuget Fable.Elmish
     nuget Fable.Elmish.React
